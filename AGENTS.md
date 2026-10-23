@@ -1,92 +1,45 @@
 # Project Agent Instructions
 
 ## Mission
-Build the project described in PROJECT_SPEC.md, following
-the ordered milestones in MILESTONES.md.
+Build the project in PROJECT_SPEC.md, following the ordered
+milestones in MILESTONES.md.
 
-## Before coding
-- Read PROJECT_SPEC.md, MILESTONES.md, and this file.
-- Inspect the existing architecture, package scripts, tests,
-  and repository status.
-- Identify the earliest incomplete milestone.
-- Summarize the scope, implementation plan, risks, and acceptance
-  criteria before changing files.
-- Ask for clarification if a requirement is materially ambiguous.
+## Workflow
+- Read PROJECT_SPEC.md, MILESTONES.md, and this file first.
+- Work on the earliest incomplete milestone, one at a time.
+- Do not expand a milestone's scope. Ask the human only if a
+  requirement is materially ambiguous; otherwise make a sensible
+  choice, note it in the completion report, and keep going.
+- After finishing a milestone, run the project's real test, lint,
+  and build commands. Fix failures before moving on.
+- Never invent test results and never weaken tests to make them pass.
+- Update MILESTONES.md with truthful status only.
+- When checks pass, publish with:
+    scripts/commit-milestone.sh <ID> "<short description>"
+  then continue directly to the next milestone. Do not wait for
+  human approval between milestones.
+- If checks fail and you cannot fix them, do not publish. Stop and
+  report the problem.
 
-## Milestone boundaries
-- Implement one milestone at a time.
-- Do not start the next milestone until the current milestone
-  has passed checks, been reviewed, and been published.
-- Do not silently expand the milestone scope.
-- Update MILESTONES.md only with truthful, verifiable status.
-- Do not mark a milestone complete merely because code exists.
+## Git rules
+- Work directly on main. No feature branches, no pull requests.
+- scripts/commit-milestone.sh is the only way to commit and push.
+  It sets the git author and SSH key, rotating between teammates.
+- Never run git commit, git push, or git config yourself.
+- Never force-push, rewrite history, or amend commits.
+- Never read or print ~/.ssh or any key.
 
-## Branching
-- Never develop directly on main.
-- Use scripts/start-milestone.sh M01 to create a milestone branch.
-- Use milestone/M01 as the branch naming convention.
-- Never force-push, rewrite published history, or delete branches
-  without explicit human approval.
-- If main has changed, stop and ask before rebasing or merging
-  other work into the active feature branch.
+## Quality
+- Follow existing conventions and prefer simple, maintainable code.
+- Add or update tests for meaningful behaviour.
+- Never commit secrets, API keys, or personal data. Keep them in
+  .env, which must stay in .gitignore.
+- Do not commit generated artifacts unless the project requires them.
+- Ask before installing major new dependencies or running destructive
+  commands against shared data.
 
-## Implementation quality
-- Follow existing conventions and architecture.
-- Prefer simple, maintainable implementations.
-- Add or update tests for meaningful behavior.
-- Never invent successful test results.
-- Do not weaken tests merely to make them pass.
-- Do not commit generated artifacts unless required by the project.
-- Never expose secrets, credentials, personal data, or API keys.
-
-## Verification
-- Discover the actual test, lint, type-check, and build commands
-  from the project configuration.
-- Run the applicable checks after implementation.
-- Inspect git diff and git diff --check.
-- Report checks that were skipped and why.
-- Fix failures before asking for approval.
-- Do not claim success when a check fails.
-
-## Review and publishing
-- Stop after implementation and verification.
-- Present a summary of changes, test results, risks, and
-  the complete diff for human review.
-- Do not commit, push, create a pull request, or merge until
-  a human explicitly approves the milestone.
-- After approval, ask the human to run
-  scripts/publish-milestone.sh with the intended paths.
-- The publishing script is the only approved milestone
-  publishing workflow.
-- Never bypass its confirmation prompts.
-
-## Git identity and transparency
-- Preserve the configured real commit author.
-- Never impersonate another person or change author metadata
-  just to manipulate contribution statistics.
-- Use Co-authored-by trailers only for genuine co-authors
-  who agree to the attribution.
-- The account used to authenticate a push is not necessarily
-  the commit author.
-- Never amend or rewrite a published commit to change attribution.
-
-## Security and destructive actions
-- Never print or commit secrets.
-- Do not run destructive database migrations against shared
-  or production environments without explicit approval.
-- Ask before installing new dependencies, changing deployment
-  infrastructure, or performing irreversible operations.
-- Do not force-push or push directly to main.
-- Stop if credentials, permissions, or repository ownership
-  are unclear.
-
-## Completion report
-After each milestone, report:
-1. Milestone ID and branch.
-2. Implemented functionality.
-3. Files changed.
-4. Tests and checks with actual results.
-5. Known limitations and outstanding risks.
-6. Whether human review and publishing are still pending.
-7. Commit hash and push result, only after they actually succeed.
-
+## After each milestone, report briefly
+1. Milestone ID and what was built.
+2. Checks run and their actual results.
+3. Known limitations.
+4. Commit hash and push result, only after they succeeded.
