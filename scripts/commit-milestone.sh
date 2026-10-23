@@ -4,13 +4,13 @@ set -euo pipefail
 [ $# -eq 2 ] || { echo "Usage: $0 M01 \"short description\""; exit 1; }
 MID="$1"; DESC="$2"
 
+CONF="scripts/members.conf"
+[ -f "$CONF" ] || { echo "Missing $CONF"; exit 1; }
+# Safety: refuse to run if the file isn't git-ignored (git add -A would commit it)
+git check-ignore -q "$CONF" || { echo "$CONF is not in .gitignore. Aborting."; exit 1; }
 
-MEMBERS=(
-"Vakele Godongwana|123022306+Vakele-G@users.noreply.github.com|$HOME/.ssh/id_vakele_wsl_github"
-"Siphosihle Sehume|273103277+SiphosihleSehume-ops@users.noreply.github.com|$HOME/.ssh/id_sipho_github_key"
-"Silindokuhle Zondo|175194081+Slindo-creator@users.noreply.github.com|$HOME/.ssh/id_slindo_github_key"
-"Botshelo Mogale|210411529+botshelomogale@users.noreply.github.com|$HOME/.ssh/id_botshelo_github_key"
-)
+mapfile -t MEMBERS < <(grep -vE '^\s*(#|$)' "$CONF")
+[ "${#MEMBERS[@]}" -ge 2 ] || { echo "Need at least 2 members in $CONF"; exit 1; }
 
 # Next person = whoever comes after the author of the last commit
 last="$(git log -1 --format=%ae 2>/dev/null || true)"
