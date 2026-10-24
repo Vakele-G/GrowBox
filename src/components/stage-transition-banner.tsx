@@ -1,5 +1,7 @@
 "use client";
 
+import Link from "next/link";
+import type { Route } from "next";
 import { useState, useTransition } from "react";
 import { advanceStageAction } from "@/app/actions/nudges";
 import type { StageCriterion } from "@/lib/domain/stage";
@@ -45,6 +47,16 @@ export function StageTransitionBanner({
             ? "Ibhizinisi lakho selikulungele ukwandisa okokusebenza nokufinyelela izimali zebhange."
             : "Your business is now set up for equipment expansion and bankable credit readiness."}
         </p>
+        <div className="pt-2">
+          <Link
+            href={"/preview/grow" as Route}
+            className="btn-primary inline-flex py-2 px-4 text-xs font-bold"
+          >
+            {isZu
+              ? "Hlola Ukuthengwa Kwesitofu Sesibili →"
+              : "Explore Second Fryer Affordability →"}
+          </Link>
+        </div>
       </div>
     );
   }

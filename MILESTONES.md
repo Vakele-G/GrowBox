@@ -146,7 +146,7 @@ does not duplicate ledger entries, and the export renders.
 
 ## M08 — Mocked stages, demo polish and submission pack
 
-**Status:** pending
+**Status:** done
 
 **Goal:** A judge-ready demo.
 
@@ -188,4 +188,5 @@ Append one line per published milestone: `MID — checks — commit — push`.
 - M04 — lint, typecheck, test, build pass — 314b8eb — pushed
 - M05 — lint, typecheck, test, build pass — dc3ed3d — pushed
 - M06 — lint, typecheck, test, build pass — 7b2bfa0 — pushed
-- M07 — lint, typecheck, test, build pass — <pending commit> — pending push
+- M07 — lint, typecheck, test, build pass — 17c6367 — pushed
+- M08 — lint, typecheck, test, build pass — <pending commit> — pending push

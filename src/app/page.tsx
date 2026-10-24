@@ -203,6 +203,57 @@ export default async function HomePage() {
         </Card>
       )}
 
+      {/* The 5-Stage Journey & Previews */}
+      <Card className="p-4 space-y-3">
+        <SectionTitle
+          title="The 5-Stage Journey"
+          action={<Pill tone="amber">Stage Previews</Pill>}
+        />
+        <p className="text-xs text-muted">
+          GrowBox guides township entrepreneurs from business idea to bankable enterprise.
+        </p>
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 text-xs">
+          <Link
+            href={"/preview/launch" as Route}
+            className="rounded-lg border border-line p-2.5 bg-paper hover:bg-sand/30 space-y-1 block"
+          >
+            <div className="flex items-center justify-between">
+              <span className="font-bold text-ink">Stage 2: Launch</span>
+              <Pill tone="lime">Preview</Pill>
+            </div>
+            <p className="text-[10px] text-muted">
+              Sourced municipal permit & food safety checklist.
+            </p>
+          </Link>
+
+          <Link
+            href={"/preview/grow" as Route}
+            className="rounded-lg border border-line p-2.5 bg-paper hover:bg-sand/30 space-y-1 block"
+          >
+            <div className="flex items-center justify-between">
+              <span className="font-bold text-ink">Stage 4: Grow</span>
+              <Pill tone="green">Real Maths</Pill>
+            </div>
+            <p className="text-[10px] text-muted">
+              Second fryer affordability & payback mathematics.
+            </p>
+          </Link>
+
+          <Link
+            href={"/preview/enterprise" as Route}
+            className="rounded-lg border border-line p-2.5 bg-paper hover:bg-sand/30 space-y-1 block"
+          >
+            <div className="flex items-center justify-between">
+              <span className="font-bold text-ink">Stage 5: Enterprise</span>
+              <Pill tone="amber">Pitch</Pill>
+            </div>
+            <p className="text-[10px] text-muted">
+              Multi-outlet rollout & FNB SME commercial credit.
+            </p>
+          </Link>
+        </div>
+      </Card>
+
       <BottomNav />
     </div>
   );

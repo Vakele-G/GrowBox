@@ -112,13 +112,29 @@ npm run test       # Vitest
 **Never commit `.env`.** Secrets live only in local env files and Vercel
 environment variables.
 
-## Demo
+## Demo & Judging Guide
 
 The demo uses a seeded persona — Nomsa's Kitchen, a Soweto amagwinya and slap
-chips business with 14 days of trading history. The seed script is idempotent.
+chips business with 14–30 days of trading history. The seed script is idempotent.
 
-- Deployed URL: added at milestone M01.
-- Demo credentials: recorded in the submission pack, not in this repository.
+- **Demo Login:** Click **"Sign in as Nomsa (Demo)"** on [`/login`](http://localhost:3000/login) (no password needed).
+- **Seeded Persona:** Nomsa's Kitchen (Soweto), Stage 3 (Stable), 56% gross margin, Health Score in the 60–70 Bankable-track band.
+
+### Screen & Route Directory
+
+| Route | Feature | Description |
+|-------|---------|-------------|
+| `/` | **Home & Engine** | Next Best Step card, Proactive Nudges inbox, Stage 1 Wizard card, Stage Transition banner, and Journey Previews. |
+| `/wizard` | **Costing Calculator (Hero)** | Ingredient pack sizes, recipe batch yield, unit cost, gross margin, break-even, and suggested selling price. |
+| `/log` | **15-Second Logging** | Natural language typed entry ("sold 40 gwinyas and bought oil for R180") with mandatory confirmation before saving. |
+| `/ledger` | **Ledger** | Daily trading totals, category tags, source tracking (`manual`, `text`, `fnb`), and deletion. |
+| `/dashboard` | **Financial Dashboard** | Cash runway (Thursday restock warning), stock cover days, savings buffer, and money separation prompt. |
+| `/health` | **Business Health Score** | Deterministic 6-pillar score (0–100), bankability bands, and targeted improvement advice. |
+| `/health/import` | **Simulated FNB Feed** | Statement-shaped banking lines imported through the ledger pipeline with deduplication by external ID. |
+| `/health/record` | **Credit Record** | Clean, printable/exportable trading history record with lender disclaimers and CSV download. |
+| `/preview/launch` | **Stage 2 Checklist** | Sourced, dated municipal permits, food-handling certificate, and environmental health tasks. |
+| `/preview/grow` | **Stage 4 Expansion** | Second commercial fryer affordability, extra profit per day, and real payback period maths. |
+| `/preview/enterprise` | **Stage 5 Enterprise** | Long-term formalisation, multi-outlet rollout, and commercial SME banking pitch vision. |
 
 ## Project documentation
 
