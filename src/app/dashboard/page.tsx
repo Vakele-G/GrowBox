@@ -1,29 +1,63 @@
 import { BottomNav } from "@/components/bottom-nav";
-import { Card, Pill, SectionTitle } from "@/components/ui";
+import { getRepository } from "@/lib/db/repository";
+import { DEMO_BUSINESS_ID } from "@/lib/db/seed";
+import { computeBusinessMetrics, evaluateWarnings } from "@/lib/domain/metrics";
+import type { DailyTotal } from "@/lib/domain/types";
+import { DashboardView } from "./dashboard-view";
 
-export default function DashboardPlaceholderPage() {
+export const metadata = {
+  title: "Stage 3: Dashboard & Warnings",
+};
+
+export default async function DashboardPage() {
+  const repo = getRepository();
+  const business = await repo.getBusiness(DEMO_BUSINESS_ID);
+  const transactions = await repo.getTransactions(DEMO_BUSINESS_ID);
+  const ingredients = await repo.getIngredients(DEMO_BUSINESS_ID);
+  const products = await repo.getProducts(DEMO_BUSINESS_ID);
+
+  const metrics = computeBusinessMetrics(
+    transactions,
+    ingredients,
+    products,
+    business,
+  );
+  const warnings = evaluateWarnings(metrics);
+
+  // Group daily totals
+  const dailyMap = new Map<string, DailyTotal>();
+  for (const t of transactions) {
+    const existing = dailyMap.get(t.occurredOn) ?? {
+      date: t.occurredOn,
+      salesCents: 0,
+      expensesCents: 0,
+      profitCents: 0,
+      transactionCount: 0,
+    };
+    if (t.type === "sale") {
+      existing.salesCents += t.amountCents;
+    } else {
+      existing.expensesCents += t.amountCents;
+    }
+    existing.profitCents = existing.salesCents - existing.expensesCents;
+    existing.transactionCount += 1;
+    dailyMap.set(t.occurredOn, existing);
+  }
+
+  const dailyTotals = Array.from(dailyMap.values()).sort((a, b) =>
+    b.date.localeCompare(a.date),
+  );
+
   return (
-    <div>
-      <header className="mb-6">
-        <p className="text-xs font-bold uppercase tracking-wide text-leaf">GrowBox</p>
-        <h1 className="mt-1 text-2xl font-bold text-ink">Grow</h1>
-        <p className="mt-2 text-sm text-muted">
-          Profit and cash-flow trends, stock cover, savings buffer and early warnings.
-        </p>
-      </header>
-
-      <Card className="p-4">
-        <SectionTitle title="Demo screen" />
-        <p className="text-sm text-muted">
-          The Stage 3 dashboard lands in its own milestone.
-        </p>
-        <div className="mt-3 flex flex-wrap gap-2">
-          <Pill tone="green">Profit</Pill>
-          <Pill tone="lime">Runway</Pill>
-          <Pill tone="amber">Stock</Pill>
-        </div>
-      </Card>
+    <main className="pb-16">
+      <DashboardView
+        metrics={metrics}
+        warnings={warnings}
+        dailyTotals={dailyTotals}
+        businessName={business?.name ?? "Nomsa's Kitchen"}
+        initialSeparatedMoney={business?.onboarding?.separatedMoney ?? false}
+      />
       <BottomNav />
-    </div>
+    </main>
   );
 }

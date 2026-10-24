@@ -94,7 +94,7 @@ phrase creates correct entries only after confirmation.
 
 ## M05 — Stage 3 dashboard and warnings
 
-**Status:** pending
+**Status:** done
 
 **Goal:** Show Nomsa whether the business is actually making money.
 
@@ -185,4 +185,5 @@ Append one line per published milestone: `MID — checks — commit — push`.
 - M01 — lint, typecheck, test, build pass — 8dcc770 — pushed
 - M02 — lint, typecheck, test, build pass — db369ab — pushed
 - M03 — lint, typecheck, test, build pass — 68edd63 — pushed
-- M04 — lint, typecheck, test, build pass — pending commit — pending push
+- M04 — lint, typecheck, test, build pass — 314b8eb — pushed
+- M05 — lint, typecheck, test, build pass — pending commit — pending push
