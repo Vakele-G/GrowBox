@@ -1,153 +1,104 @@
 import { z } from "zod";
-import type { Language, ParsedEntry, Product } from "@/lib/domain/types";
-import type { NudgeRuleKey } from "@/lib/domain/nudges";
-import { parseLogFallback } from "./parser";
-import { callGemini, geminiConfigured } from "./gemini";
-import { templateExplain, templateNudge } from "./templates";
+import type { ParsedEntry } from "@/lib/domain/types";
+import { parseLogFallback } from "./fallback";
+import type { ParseContext } from "./types";
 
-const parsedEntrySchema = z.object({
+export const ParsedEntrySchema = z.object({
   type: z.enum(["sale", "expense"]),
-  category: z.string().min(1).max(40),
-  amountCents: z.number().int().positive().max(100_000_000),
-  description: z.string().min(1).max(120),
-  quantity: z.number().int().positive().max(100_000).nullable().optional(),
-  productId: z.string().min(1).nullable().optional(),
-  confidence: z.number().min(0).max(1),
+  category: z.string(),
+  amountCents: z.number().int().positive(),
+  description: z.string(),
+  productId: z.string().nullable().default(null),
+  quantity: z.number().nullable().default(null),
+  confidence: z.number().min(0).max(1).default(0.9),
 });
 
-const parseResponseSchema = z.object({
-  entries: z.array(parsedEntrySchema).max(12),
-});
+export const ParsedEntriesArraySchema = z.array(ParsedEntrySchema);
 
-export interface ParseResult {
-  entries: ParsedEntry[];
-  provider: "gemini" | "fallback";
-}
+const GEMINI_TIMEOUT_MS = 8000;
 
+/**
+ * Natural language transaction parser.
+ * Always attempts AI parsing with an 8-second timeout, falling back
+ * safely to the deterministic regex parser on timeout, network error,
+ * missing API key, or invalid schema.
+ */
 export async function parseLog(
   text: string,
-  ctx: { products: Product[] },
-): Promise<ParseResult> {
-  const fallback = parseLogFallback(text, ctx.products);
-  if (!geminiConfigured() || !text.trim()) {
-    return { entries: fallback, provider: "fallback" };
-  }
+  ctx?: ParseContext,
+): Promise<ParsedEntry[]> {
+  const trimmed = text.trim();
+  if (!trimmed) return [];
 
-  const productList = ctx.products
-    .map((product) => `${product.id} = ${product.name} (R${product.sellingPriceCents / 100})`)
-    .join("\n");
+  const apiKey = process.env.GEMINI_API_KEY ?? "";
+  const isKeyAvailable =
+    apiKey && !apiKey.includes("your-") && apiKey.length > 10;
 
-  const result = await callGemini(
-    `Parse this South African informal trader note into ledger entries.
-
-Products (use the exact id):
-${productList || "none"}
-
-Note: "${text}"
-
-Return JSON: {"entries":[{"type":"sale"|"expense","category":"sales"|"stock"|"transport"|"utilities"|"other","amountCents":integer cents,"description":"short label","quantity":integer|null,"productId":"exact id or null","confidence":0..1}]}
-Money is South African rand. Never invent an amount that is not stated or derivable from quantity times the product price.`,
-    {
-      system:
-        "You extract bookkeeping entries for a township food business. Return JSON only. Amounts are integer cents. Prefer the given product ids.",
-    },
-  );
-
-  if (!result.ok || !result.text) {
-    return { entries: fallback, provider: "fallback" };
+  if (!isKeyAvailable) {
+    return parseLogFallback(trimmed, ctx);
   }
 
   try {
-    const parsed = parseResponseSchema.safeParse(JSON.parse(result.text));
-    if (!parsed.success || parsed.data.entries.length === 0) {
-      return { entries: fallback, provider: "fallback" };
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), GEMINI_TIMEOUT_MS);
+
+    const prompt = `You are a financial record assistant for a South African informal township business (Nomsa's Kitchen).
+Parse this daily log input into structured sales and expense entries:
+Input: "${trimmed}"
+
+Known products:
+- Amagwinya (id: "prod_amagwinya", unit selling price: R5.00 / 500 cents)
+- Slap chips small (id: "prod_chips_small", unit selling price: R20.00 / 2000 cents)
+- Slap chips large (id: "prod_chips_large", unit selling price: R30.00 / 3000 cents)
+
+Return ONLY a JSON array of objects conforming to:
+[
+  {
+    "type": "sale" | "expense",
+    "category": string (e.g. "sales", "stock", "utilities", "transport", "rent", "owner-draw"),
+    "amountCents": integer cents (e.g. R180 = 18000),
+    "description": string,
+    "productId": string or null,
+    "quantity": number or null,
+    "confidence": number between 0 and 1
+  }
+]`;
+
+    const response = await fetch(
+      `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`,
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          contents: [{ parts: [{ text: prompt }] }],
+          generationConfig: {
+            responseMimeType: "application/json",
+            temperature: 0.1,
+          },
+        }),
+        signal: controller.signal,
+      },
+    );
+
+    clearTimeout(timeoutId);
+
+    if (!response.ok) {
+      return parseLogFallback(trimmed, ctx);
     }
-    const validProductIds = new Set(ctx.products.map((product) => product.id));
-    const entries: ParsedEntry[] = parsed.data.entries.map((entry) => ({
-      type: entry.type,
-      category: entry.category,
-      amountCents: entry.amountCents,
-      description: entry.description,
-      quantity: entry.quantity ?? null,
-      productId:
-        entry.productId && validProductIds.has(entry.productId) ? entry.productId : null,
-      confidence: entry.confidence,
-    }));
-    return { entries, provider: "gemini" };
+
+    const data = await response.json();
+    const rawJsonText =
+      data.candidates?.[0]?.content?.parts?.[0]?.text?.trim() ?? "[]";
+    const rawData = JSON.parse(rawJsonText);
+    const validated = ParsedEntriesArraySchema.parse(rawData);
+
+    if (validated.length === 0) {
+      return parseLogFallback(trimmed, ctx);
+    }
+
+    return validated;
   } catch {
-    return { entries: fallback, provider: "fallback" };
-  }
-}
-
-const messageSchema = z.object({ message: z.string().min(1).max(600) });
-
-export async function phraseNudge(
-  ruleKey: NudgeRuleKey,
-  payload: Record<string, string | number | boolean | null>,
-  lang: Language,
-): Promise<string> {
-  const fallback = templateNudge(ruleKey, payload, lang);
-  if (!geminiConfigured()) return fallback;
-
-  const language = lang === "zu" ? "isiZulu" : "South African English";
-  const result = await callGemini(
-    `Rewrite this business alert in ${language}. Keep every number and currency amount exactly the same. Be warm, plain and specific. Maximum 55 words.
-
-Rule: ${ruleKey}
-Data: ${JSON.stringify(payload)}
-Draft: ${fallback}
-
-Return JSON: {"message":"..."}`,
-    {
-      system:
-        "You phrase alerts for an informal trader. You never calculate or change numbers. Return JSON only.",
-    },
-  );
-  if (!result.ok || !result.text) return fallback;
-  try {
-    const parsed = messageSchema.safeParse(JSON.parse(result.text));
-    return parsed.success ? parsed.data.message : fallback;
-  } catch {
-    return fallback;
-  }
-}
-
-export async function explain(
-  metric: string,
-  payload: Record<string, string | number | boolean | null>,
-  lang: Language,
-): Promise<string> {
-  const fallback = templateExplain(metric, payload, lang);
-  if (!geminiConfigured()) return fallback;
-
-  const result = await callGemini(
-    `Explain in ${lang === "zu" ? "isiZulu" : "plain South African English"} how GrowBox calculated this metric. Use the exact numbers. Maximum 45 words. Return JSON: {"message":"..."}
-
-Metric: ${metric}
-Data: ${JSON.stringify(payload)}
-Deterministic explanation: ${fallback}`,
-    { system: "You explain a deterministic calculation. Never change a number. JSON only." },
-  );
-  if (!result.ok || !result.text) return fallback;
-  try {
-    const parsed = messageSchema.safeParse(JSON.parse(result.text));
-    return parsed.success ? parsed.data.message : fallback;
-  } catch {
-    return fallback;
-  }
-}
-
-export async function translate(text: string, lang: Language): Promise<string> {
-  if (!geminiConfigured()) return text;
-  const result = await callGemini(
-    `Translate this app string into ${lang === "zu" ? "isiZulu" : "South African English"}. Keep numbers and currency. Return JSON: {"message":"..."}\n\n${text}`,
-    { system: "You translate short UI strings. Return JSON only." },
-  );
-  if (!result.ok || !result.text) return text;
-  try {
-    const parsed = messageSchema.safeParse(JSON.parse(result.text));
-    return parsed.success ? parsed.data.message : text;
-  } catch {
-    return text;
+    // Timeout, network failure, or schema invalidation -> safe fallback
+    return parseLogFallback(trimmed, ctx);
   }
 }

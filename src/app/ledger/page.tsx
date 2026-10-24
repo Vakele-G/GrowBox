@@ -1,29 +1,45 @@
 import { BottomNav } from "@/components/bottom-nav";
-import { Card, Pill, SectionTitle } from "@/components/ui";
+import { getRepository } from "@/lib/db/repository";
+import { DEMO_BUSINESS_ID } from "@/lib/db/seed";
+import type { DailyTotal } from "@/lib/domain/types";
+import { LedgerView } from "./ledger-view";
 
-export default function LedgerPlaceholderPage() {
+export const metadata = {
+  title: "Ledger",
+};
+
+export default async function LedgerPage() {
+  const repo = getRepository();
+  const transactions = await repo.getTransactions(DEMO_BUSINESS_ID);
+
+  // Compute daily totals
+  const dailyMap = new Map<string, DailyTotal>();
+  for (const t of transactions) {
+    const existing = dailyMap.get(t.occurredOn) ?? {
+      date: t.occurredOn,
+      salesCents: 0,
+      expensesCents: 0,
+      profitCents: 0,
+      transactionCount: 0,
+    };
+    if (t.type === "sale") {
+      existing.salesCents += t.amountCents;
+    } else {
+      existing.expensesCents += t.amountCents;
+    }
+    existing.profitCents = existing.salesCents - existing.expensesCents;
+    existing.transactionCount += 1;
+    dailyMap.set(t.occurredOn, existing);
+  }
+
+  const dailyTotals = Array.from(dailyMap.values()).sort((a, b) =>
+    b.date.localeCompare(a.date),
+  );
+
   return (
-    <div>
-      <header className="mb-6">
-        <p className="text-xs font-bold uppercase tracking-wide text-leaf">GrowBox</p>
-        <h1 className="mt-1 text-2xl font-bold text-ink">Ledger</h1>
-        <p className="mt-2 text-sm text-muted">
-          Every sale and expense in one place, with daily totals and edit/delete.
-        </p>
-      </header>
-
-      <Card className="p-4">
-        <SectionTitle title="Demo screen" />
-        <p className="text-sm text-muted">
-          The ledger view lands in the transaction-logging milestone.
-        </p>
-        <div className="mt-3 flex flex-wrap gap-2">
-          <Pill tone="green">Daily totals</Pill>
-          <Pill tone="lime">Edit</Pill>
-          <Pill tone="amber">Delete</Pill>
-        </div>
-      </Card>
+    <main className="pb-16">
+      <LedgerView initialTransactions={transactions} dailyTotals={dailyTotals} />
       <BottomNav />
-    </div>
+    </main>
   );
 }

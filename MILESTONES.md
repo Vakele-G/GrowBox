@@ -76,7 +76,7 @@ completes the wizard and sees correct numbers for the demo inputs.
 
 ## M04 — Transaction logging and ledger
 
-**Status:** pending
+**Status:** done
 
 **Goal:** Log a trading day in under 15 seconds, by typing.
 
@@ -184,4 +184,5 @@ logging, dashboard, nudges, stage transition, backup video, credentials.
 Append one line per published milestone: `MID — checks — commit — push`.
 - M01 — lint, typecheck, test, build pass — 8dcc770 — pushed
 - M02 — lint, typecheck, test, build pass — db369ab — pushed
-- M03 — lint, typecheck, test, build pass — pending commit — pending push
+- M03 — lint, typecheck, test, build pass — 68edd63 — pushed
+- M04 — lint, typecheck, test, build pass — pending commit — pending push
