@@ -4,6 +4,7 @@ import { BottomNav } from "@/components/bottom-nav";
 import { LanguageSwitcher } from "@/components/language-switcher";
 import { NextBestStepCard } from "@/components/next-best-step-card";
 import { NudgeInbox } from "@/components/nudge-inbox";
+import { PersonaSwitcher } from "@/components/persona-switcher";
 import { StageTransitionBanner } from "@/components/stage-transition-banner";
 import { Card, Pill, SectionTitle } from "@/components/ui";
 import { getRepository } from "@/lib/db/repository";
@@ -61,7 +62,7 @@ export default async function HomePage() {
         <div className="flex items-center justify-between">
           <p className="text-xs font-bold uppercase tracking-wide text-leaf">GrowBox</p>
           <div className="flex items-center gap-2">
-            <Pill tone="green">Stage: {currentStage.toUpperCase()}</Pill>
+            <PersonaSwitcher currentStage={currentStage} />
             <LanguageSwitcher currentLanguage={language} />
           </div>
         </div>
