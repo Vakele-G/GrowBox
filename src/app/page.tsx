@@ -1,41 +1,100 @@
 import Link from "next/link";
 import type { Route } from "next";
 import { BottomNav } from "@/components/bottom-nav";
+import { LanguageSwitcher } from "@/components/language-switcher";
+import { NextBestStepCard } from "@/components/next-best-step-card";
+import { NudgeInbox } from "@/components/nudge-inbox";
+import { StageTransitionBanner } from "@/components/stage-transition-banner";
 import { Card, Pill, SectionTitle } from "@/components/ui";
 import { getRepository } from "@/lib/db/repository";
 import { DEMO_BUSINESS_ID } from "@/lib/db/seed";
+import { computeBusinessMetrics } from "@/lib/domain/metrics";
+import { determineNextBestStep, generateNudges } from "@/lib/domain/nudges";
+import { detectStage } from "@/lib/domain/stage";
+import type { Business, Language } from "@/lib/domain/types";
 
 export default async function HomePage() {
   const repo = getRepository();
-  const business = await repo.getBusiness(DEMO_BUSINESS_ID);
+  const rawBusiness = await repo.getBusiness(DEMO_BUSINESS_ID);
   const stageProgress = await repo.getStageProgress(DEMO_BUSINESS_ID);
   const planItems = await repo.getPlanItems(DEMO_BUSINESS_ID);
   const products = await repo.getProducts(DEMO_BUSINESS_ID);
+  const ingredients = await repo.getIngredients(DEMO_BUSINESS_ID);
+  const transactions = await repo.getTransactions(DEMO_BUSINESS_ID);
 
-  const stage = stageProgress?.stage ?? business?.stage ?? "idea";
-  const costing = business?.onboarding?.costing;
+  const business: Business = rawBusiness ?? {
+    id: DEMO_BUSINESS_ID,
+    ownerId: "demo_owner",
+    name: "Nomsa's Kitchen",
+    stage: "stable",
+    municipality: "City of Johannesburg",
+    language: "en",
+    monthlyBudgetCents: 150_000,
+    onboarding: null,
+    createdAt: "2026-09-01T00:00:00+02:00",
+  };
+
+  const language: Language = business.language ?? "en";
+  const costing = business.onboarding?.costing;
+
+  // Compute metrics and stage progression
+  const metrics = computeBusinessMetrics(transactions, ingredients, products, business, "2026-10-25");
+  const stageInfo = detectStage(business, metrics, stageProgress);
+
+  // Retrieve or initialize nudges
+  const storedNudges = await repo.getNudges(DEMO_BUSINESS_ID);
+  let activeNudges = storedNudges.filter((n) => n.status === "new" || n.status === "seen");
+
+  if (storedNudges.length === 0) {
+    const generated = generateNudges(business, metrics, stageInfo, "2026-10-25");
+    await repo.saveNudges(generated);
+    activeNudges = generated;
+  }
+
+  const nextBestStep = determineNextBestStep(stageInfo, activeNudges, metrics);
+  const currentStage = stageProgress?.stage ?? business.stage ?? "idea";
 
   return (
-    <div className="space-y-5">
-      <header>
+    <div className="space-y-5 pb-6">
+      {/* Header with App Identity, Stage, and Language Switcher */}
+      <header className="space-y-2">
         <div className="flex items-center justify-between">
           <p className="text-xs font-bold uppercase tracking-wide text-leaf">GrowBox</p>
-          <Pill tone="green">Stage: {stage.toUpperCase()}</Pill>
+          <div className="flex items-center gap-2">
+            <Pill tone="green">Stage: {currentStage.toUpperCase()}</Pill>
+            <LanguageSwitcher currentLanguage={language} />
+          </div>
         </div>
-        <h1 className="mt-1 text-2xl font-bold text-ink">
-          {business?.name ?? "Nomsa's Kitchen"}
-        </h1>
-        <p className="mt-1 text-sm text-muted">
-          {business?.municipality ?? "Soweto, Johannesburg"} · Turning hustle into a bankable business.
-        </p>
+        <div>
+          <h1 className="text-2xl font-bold text-ink">{business.name}</h1>
+          <p className="text-xs text-muted">
+            {business.municipality} · Turning street hustle into a bankable business.
+          </p>
+        </div>
       </header>
+
+      {/* Stage Transition Announcement (when criteria are met) */}
+      {stageInfo.readyToAdvance && stageInfo.nextStage && (
+        <StageTransitionBanner
+          currentStage={stageInfo.currentStage}
+          nextStage={stageInfo.nextStage}
+          criteria={stageInfo.criteria}
+          language={language}
+        />
+      )}
+
+      {/* Hero: Next Best Step Card */}
+      <NextBestStepCard step={nextBestStep} />
+
+      {/* Proactive Nudges & Alerts Inbox */}
+      <NudgeInbox nudges={activeNudges} language={language} />
 
       {/* Hero Feature Card: Stage 1 Wizard & Costing Calculator */}
       <Card className="p-5 border-leaf/40 bg-mint/20 space-y-3">
         <div className="flex items-start justify-between gap-2">
           <div>
             <p className="text-xs font-bold uppercase tracking-wider text-forest">
-              Hero Feature · Stage 1
+              Stage 1 Feature
             </p>
             <h2 className="text-lg font-bold text-ink">
               Costing & Launch Planning Wizard
@@ -44,7 +103,7 @@ export default async function HomePage() {
           <Pill tone="lime">Interactive</Pill>
         </div>
 
-        <p className="text-sm text-muted">
+        <p className="text-xs text-muted leading-relaxed">
           Cost every ingredient from wholesale pack sizes, calculate batch yield and gross margin, and generate a verified launch plan.
         </p>
 
@@ -74,7 +133,7 @@ export default async function HomePage() {
         <div className="pt-1">
           <Link
             href={"/wizard" as Route}
-            className="btn-primary w-full flex justify-center text-center font-semibold"
+            className="btn-primary w-full flex justify-center text-center font-bold text-xs py-2.5"
           >
             {costing ? "Re-calculate or Update Launch Plan →" : "Start Costing & Launch Wizard →"}
           </Link>
@@ -90,10 +149,12 @@ export default async function HomePage() {
           />
           <div className="divide-y divide-line">
             {products.map((p) => (
-              <div key={p.id} className="py-2 flex items-center justify-between text-sm">
+              <div key={p.id} className="py-2 flex items-center justify-between text-xs">
                 <div>
                   <p className="font-semibold text-ink">{p.name}</p>
-                  <p className="text-xs text-muted">Batch yield: {p.batchYield} {p.unitLabel}s</p>
+                  <p className="text-[10px] text-muted">
+                    Batch yield: {p.batchYield} {p.unitLabel}s
+                  </p>
                 </div>
                 <span className="font-bold text-forest">
                   R{(p.sellingPriceCents / 100).toFixed(2)}
@@ -104,7 +165,7 @@ export default async function HomePage() {
         </Card>
       )}
 
-      {/* Launch Plan Items */}
+      {/* Startup Checklist */}
       {planItems.length > 0 && (
         <Card className="p-4 space-y-3">
           <SectionTitle

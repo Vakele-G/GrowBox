@@ -79,7 +79,11 @@ export function templateNudge(
   payload: Payload,
   lang: Language,
 ): string {
-  return NUDGE_TEMPLATES[ruleKey][lang](payload);
+  const template = NUDGE_TEMPLATES[ruleKey];
+  if (!template) {
+    return String(payload.message ?? "");
+  }
+  return template[lang](payload);
 }
 
 export function templateExplain(

@@ -14,7 +14,7 @@ export interface Business {
   municipality: string;
   language: Language;
   monthlyBudgetCents: number;
-  onboarding: OnboardingData;
+  onboarding: OnboardingData | null;
   createdAt: string;
 }
 

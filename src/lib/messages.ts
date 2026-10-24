@@ -17,6 +17,19 @@ export interface Messages {
     demoButton: string;
     demoHint: string;
   };
+  home: {
+    nextBestStep: string;
+    proactiveAlerts: string;
+    noAlerts: string;
+    markDone: string;
+    dismiss: string;
+    readyToGrow: string;
+    advanceStage: string;
+    advancementSubtext: string;
+    costingWizard: string;
+    productsAndMenu: string;
+    startupChecklist: string;
+  };
 }
 
 export const enMessages: Messages = {
@@ -36,6 +49,20 @@ export const enMessages: Messages = {
     demoButton: "Sign in as Nomsa (Demo)",
     demoHint: "No password required for the demo account.",
   },
+  home: {
+    nextBestStep: "Next Best Step",
+    proactiveAlerts: "Proactive Insights & Alerts",
+    noAlerts: "All caught up! No active alerts right now.",
+    markDone: "Done",
+    dismiss: "Dismiss",
+    readyToGrow: "Ready to Grow! (Stage 3 → Stage 4)",
+    advanceStage: "Advance to Grow Stage →",
+    advancementSubtext:
+      "Your 30 days of consistent, profitable trading qualify you for equipment expansion.",
+    costingWizard: "Costing & Launch Planning Wizard",
+    productsAndMenu: "Products & Menu",
+    startupChecklist: "Startup Checklist",
+  },
 };
 
 export const zuMessages: Messages = {
@@ -54,6 +81,20 @@ export const zuMessages: Messages = {
     subtitle: "Ngena nge-akhawunti yedemo ukuze ubone ibhizinisi likaNomsa.",
     demoButton: "Ngena njengoNomsa (Demo)",
     demoHint: "Ayikho iphasiwedi edingekayo ku-akhawunti yedemo.",
+  },
+  home: {
+    nextBestStep: "Isinyathelo Esilandelayo Esihle Kakhulu",
+    proactiveAlerts: "Imiyalezo Nezaziso Zebhizinisi",
+    noAlerts: "Konke kuhlelekile! Azikho izaziso ezintsha okwamanje.",
+    markDone: "Kwenziwe",
+    dismiss: "Susa",
+    readyToGrow: "Usukulungele Ukukhula! (Isigaba 3 → Isigaba 4)",
+    advanceStage: "Qhubekela Esigabeni Sokukhula →",
+    advancementSubtext:
+      "Izinsuku zakho ezingu-30 zokuhweba okuhle zikuvumela ukuthi wandise okokusebenza.",
+    costingWizard: "Iwizadi Yezindleko Nokuhlela",
+    productsAndMenu: "Imikhiqizo Nemenu",
+    startupChecklist: "Uhla Lokuqala",
   },
 };
 

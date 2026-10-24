@@ -194,7 +194,7 @@ export function computeMetrics(
     averageDailyExpenseCents,
     averageDailySalesCents,
     cashRunwayDays: cashRunwayDays(cash, averageDailyExpenseCents),
-    stockDaysCover: stockDaysCover(business.onboarding.stockUnitsOnHand, unitsPerDay),
+    stockDaysCover: stockDaysCover(business.onboarding?.stockUnitsOnHand, unitsPerDay),
     savingsBufferWeeks: savingsBufferWeeks(cash, last28.expensesCents),
     nextRestockCostCents,
     restockShortfallCents: Math.max(0, nextRestockCostCents - cash),

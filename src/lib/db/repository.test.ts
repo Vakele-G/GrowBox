@@ -18,7 +18,7 @@ describe("M02 — Data Model, Seed and Repository Layer", () => {
   it("generates minimal seed data for onboarding wizard", () => {
     const data = createSeedData("2026-10-24", "minimal");
     expect(data.businesses[0]?.stage).toBe("idea");
-    expect(data.businesses[0]?.onboarding.completed).toBe(false);
+    expect(data.businesses[0]?.onboarding?.completed).toBe(false);
     expect(data.transactions).toHaveLength(0);
     expect(data.stageProgress[0]?.stage).toBe("idea");
   });

@@ -1,4 +1,4 @@
-import { addDays, diffDays, formatWeekdayZA, parseDateString, today } from "./dates";
+import { addDays, diffDays, parseDateString, today } from "./dates";
 import type {
   Business,
   BusinessMetrics,
@@ -265,3 +265,5 @@ export function evaluateWarnings(
 
   return warnings;
 }
+
+export { computeBusinessMetrics as calculateMetrics };

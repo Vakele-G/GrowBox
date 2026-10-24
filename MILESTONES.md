@@ -111,7 +111,7 @@ seeded persona produces the expected Thursday cash warning.
 
 ## M06 — Proactive engine and next best step
 
-**Status:** pending
+**Status:** done
 
 **Goal:** The app tells the user what to do next, unprompted.
 
@@ -186,4 +186,5 @@ Append one line per published milestone: `MID — checks — commit — push`.
 - M02 — lint, typecheck, test, build pass — db369ab — pushed
 - M03 — lint, typecheck, test, build pass — 68edd63 — pushed
 - M04 — lint, typecheck, test, build pass — 314b8eb — pushed
-- M05 — lint, typecheck, test, build pass — pending commit — pending push
+- M05 — lint, typecheck, test, build pass — dc3ed3d — pushed
+- M06 — lint, typecheck, test, build pass — <pending commit> — pushed

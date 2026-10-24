@@ -46,8 +46,8 @@ export function evaluateStage(
 
   if (business.stage === "idea") {
     const planSaved =
-      business.onboarding.completed &&
-      Boolean(business.onboarding.costing?.suggestedPriceCents);
+      Boolean(business.onboarding?.completed) &&
+      Boolean(business.onboarding?.costing?.suggestedPriceCents);
     criteria.push({
       key: "launch_plan",
       labelEn: "Launch plan and startup budget saved",

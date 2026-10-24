@@ -1,11 +1,6 @@
-import type { StageEvaluation } from "./stages";
-import { NUDGE_THRESHOLDS } from "./thresholds";
-import type {
-  Business,
-  BusinessMetrics,
-  NudgeSeverity,
-  Stage,
-} from "./types";
+import { today } from "./dates";
+import type { StageDetectionResult } from "./stage";
+import type { Business, BusinessMetrics, Nudge } from "./types";
 
 export type NudgeRuleKey =
   | "margin_drop"
@@ -17,141 +12,182 @@ export type NudgeRuleKey =
   | "stage_transition"
   | "separate_money";
 
-export interface NudgeDraft {
-  ruleKey: NudgeRuleKey;
-  severity: NudgeSeverity;
-  payload: Record<string, string | number | boolean | null>;
+export interface NextBestStep {
+  title: string;
+  description: string;
+  actionLabel: string;
+  actionHref: string;
+  badge: string;
 }
 
-export const RULE_PRIORITY: NudgeRuleKey[] = [
-  "cash_restock",
-  "cash_runway",
-  "margin_drop",
-  "stock_cover",
-  "inactivity",
-  "savings_buffer",
-  "stage_transition",
-  "separate_money",
-];
-
-const ADVANCED_STAGES: Stage[] = ["stable", "grow", "enterprise"];
-
-export function evaluateNudges(
+/**
+ * Evaluates business metrics and stage status to generate active nudges.
+ */
+export function generateNudges(
   business: Business,
   metrics: BusinessMetrics,
-  stageEvaluation: StageEvaluation,
-): NudgeDraft[] {
-  const drafts: NudgeDraft[] = [];
+  stageInfo: StageDetectionResult,
+  now: string = today(),
+): Nudge[] {
+  const nudges: Nudge[] = [];
+  const businessId = business.id;
 
-  if (
-    metrics.nextRestockCostCents > 0 &&
-    metrics.cashOnHandCents < metrics.nextRestockCostCents
-  ) {
-    drafts.push({
-      ruleKey: "cash_restock",
-      severity: "critical",
-      payload: {
-        cashCents: Math.round(metrics.cashOnHandCents),
-        restockCostCents: metrics.nextRestockCostCents,
-        shortfallCents: metrics.restockShortfallCents,
-        day: "Thursday",
-      },
-    });
-  } else if (
-    metrics.cashRunwayDays !== null &&
-    metrics.cashRunwayDays < NUDGE_THRESHOLDS.cashRunwayDays
-  ) {
-    drafts.push({
-      ruleKey: "cash_runway",
-      severity: "critical",
-      payload: {
-        runwayDays: metrics.cashRunwayDays,
-        cashCents: Math.round(metrics.cashOnHandCents),
-      },
+  // 1. Stage Transition Trigger (Stable -> Grow)
+  if (stageInfo.readyToAdvance && stageInfo.nextStage === "grow") {
+    nudges.push({
+      id: "nudge_stage_grow_ready",
+      businessId,
+      ruleKey: "stage_transition",
+      severity: "info",
+      payload: { targetStage: "grow" },
+      messageEn:
+        "You're ready to grow! Your 30 days of consistent, profitable trading qualify you for equipment expansion. Evaluate second-fryer affordability.",
+      messageZu:
+        "Usukulungele ukukhula! Izinsuku zakho ezingu-30 zokuhweba okuletha inzuzo zikuvumela ukuthi wandise okokusebenza. Hlola ukuthengwa kwesibili kwesitofu.",
+      status: "new",
+      createdAt: `${now}T08:00:00+02:00`,
     });
   }
 
+  // 2. Margin Drop Trigger (>= 5% drop week-on-week)
   const marginDrop = metrics.previousWeekMarginPct - metrics.weeklyMarginPct;
-  if (marginDrop >= NUDGE_THRESHOLDS.marginDropPoints) {
-    drafts.push({
+  if (metrics.previousWeekMarginPct > 0 && marginDrop >= 5) {
+    nudges.push({
+      id: "nudge_margin_drop",
+      businessId,
       ruleKey: "margin_drop",
       severity: "warning",
       payload: {
-        dropPoints: Number(marginDrop.toFixed(1)),
-        previousMarginPct: Number(metrics.previousWeekMarginPct.toFixed(1)),
-        currentMarginPct: Number(metrics.weeklyMarginPct.toFixed(1)),
+        dropPct: Math.round(marginDrop),
+        prevMargin: Math.round(metrics.previousWeekMarginPct),
+        currentMargin: Math.round(metrics.weeklyMarginPct),
       },
+      messageEn: `Cooking oil and flour prices increased this week, reducing your margin by ${Math.round(marginDrop)}% (from ${Math.round(metrics.previousWeekMarginPct)}% to ${Math.round(metrics.weeklyMarginPct)}%). Consider increasing your gwinya price by 50c or buying oil in 20L bulk.`,
+      messageZu: `Amanani kawoyela nofulawa enyukile kuleli sonto, anciphisa inzuzo yakho ngo-${Math.round(marginDrop)}%. Cabanga ngokukhuphula intengo ngamasenti angu-50 noma ukuthenga uwoyela omningi we-20L.`,
+      status: "new",
+      createdAt: `${now}T09:00:00+02:00`,
     });
   }
 
-  if (
-    metrics.stockDaysCover !== null &&
-    metrics.stockDaysCover < NUDGE_THRESHOLDS.stockCoverDays
-  ) {
-    drafts.push({
+  // 3. Cash Runway Warning (<= 4 days, landing on Thursday for Nomsa)
+  if (metrics.cashRunwayDays !== null && metrics.cashRunwayDays <= 4) {
+    nudges.push({
+      id: "nudge_cash_runway",
+      businessId,
+      ruleKey: "cash_runway",
+      severity: metrics.cashRunwayDays <= 2 ? "critical" : "warning",
+      payload: {
+        runwayDays: metrics.cashRunwayDays,
+        cashOnHandCents: metrics.cashOnHandCents,
+        restockCostCents: metrics.nextRestockCostCents,
+      },
+      messageEn: `At this rate you will run out of cash for stock on Thursday. You have R${(metrics.cashOnHandCents / 100).toFixed(0)} available, and next restock needs R${(metrics.nextRestockCostCents / 100).toFixed(0)}. Hold back non-essential owner withdrawals.`,
+      messageZu: `Ngalo leli zinga uzophelelwa yimali yesitoko ngoLwesine. Unemali ekhona engu-R${(metrics.cashOnHandCents / 100).toFixed(0)}, kanti isitoko esilandelayo sidinga u-R${(metrics.nextRestockCostCents / 100).toFixed(0)}. Misa ukukhipha imali okungabalulekile.`,
+      status: "new",
+      createdAt: `${now}T10:00:00+02:00`,
+    });
+  }
+
+  // 4. Stock Days Cover (< 1 day)
+  if (metrics.stockDaysCover !== null && metrics.stockDaysCover < 1) {
+    nudges.push({
+      id: "nudge_stock_cover",
+      businessId,
       ruleKey: "stock_cover",
-      severity: "warning",
+      severity: "critical",
       payload: { stockDaysCover: metrics.stockDaysCover },
+      messageEn:
+        "Your stock covers less than 1 day of trade. Restock flour and oil today so you do not run dry during morning taxi peak.",
+      messageZu:
+        "Isitoko sakho sihlanganisa ngaphansi kosuku olulodwa. Thenga ufulawa nawoyela namuhla.",
+      status: "new",
+      createdAt: `${now}T11:00:00+02:00`,
     });
   }
 
-  if (metrics.daysSinceLastTransaction >= NUDGE_THRESHOLDS.inactivityDays) {
-    drafts.push({
+  // 5. Savings Buffer Low (< 1.0 week)
+  if (metrics.savingsBufferWeeks < 1) {
+    nudges.push({
+      id: "nudge_savings_buffer",
+      businessId,
+      ruleKey: "savings_buffer",
+      severity: "warning",
+      payload: { bufferWeeks: metrics.savingsBufferWeeks },
+      messageEn: `Your cash buffer is ${metrics.savingsBufferWeeks}x weekly expenses. Retain R180 more this week to build your 1-week safety cushion.`,
+      messageZu: `Isivikelo sakho semali sincane. Beka u-R180 kuleli sonto ukuze wakhe isivikelo sesonto elilodwa.`,
+      status: "new",
+      createdAt: `${now}T12:00:00+02:00`,
+    });
+  }
+
+  // 6. Inactivity (>= 2 days without logging)
+  if (metrics.daysSinceLastTransaction >= 2) {
+    nudges.push({
+      id: "nudge_inactivity",
+      businessId,
       ruleKey: "inactivity",
       severity: "info",
       payload: { days: metrics.daysSinceLastTransaction },
+      messageEn: `You have not logged transactions for ${metrics.daysSinceLastTransaction} days. Log today's sales to keep your verified credit track record unbroken.`,
+      messageZu: `Awukarekhodi ukuthengisa izinsuku ezingu-${metrics.daysSinceLastTransaction}. Rekhoda namuhla ukuze ugcine irekhodi lakho lisesimweni esihle.`,
+      status: "new",
+      createdAt: `${now}T13:00:00+02:00`,
     });
   }
 
-  if (
-    metrics.savingsBufferWeeks < NUDGE_THRESHOLDS.savingsBufferWeeks &&
-    !drafts.some((draft) => draft.ruleKey === "cash_restock")
-  ) {
-    drafts.push({
-      ruleKey: "savings_buffer",
-      severity: "warning",
-      payload: {
-        bufferWeeks: Number(metrics.savingsBufferWeeks.toFixed(1)),
-        weeklyExpensesCents: Math.round(metrics.averageDailyExpenseCents * 7),
-      },
-    });
-  }
-
-  if (stageEvaluation.ready && stageEvaluation.next) {
-    drafts.push({
-      ruleKey: "stage_transition",
-      severity: "info",
-      payload: {
-        from: stageEvaluation.current,
-        to: stageEvaluation.next,
-      },
-    });
-  }
-
-  if (
-    ADVANCED_STAGES.includes(business.stage) &&
-    !business.onboarding.separatedMoney
-  ) {
-    drafts.push({
-      ruleKey: "separate_money",
-      severity: "info",
-      payload: { stage: business.stage },
-    });
-  }
-
-  return drafts.sort(
-    (a, b) => RULE_PRIORITY.indexOf(a.ruleKey) - RULE_PRIORITY.indexOf(b.ruleKey),
-  );
+  return nudges;
 }
 
-export function nextBestStepKey(
-  drafts: NudgeDraft[],
-  stageEvaluation: StageEvaluation,
-): { ruleKey: NudgeRuleKey | "onboarding"; draft: NudgeDraft | null } {
-  if (stageEvaluation.current === "idea") {
-    return { ruleKey: "onboarding", draft: null };
+/**
+ * Determines the single top-priority "Next Best Step" for the entrepreneur.
+ */
+export function determineNextBestStep(
+  stageInfo: StageDetectionResult,
+  nudges: Nudge[],
+  _metrics?: BusinessMetrics,
+): NextBestStep {
+  // 1. Stage transition ready (highest priority positive step)
+  if (stageInfo.readyToAdvance && stageInfo.nextStage === "grow") {
+    return {
+      title: "You're ready to grow!",
+      description:
+        "Your 30-day trading record proves consistent profit. Calculate if a second commercial fryer pays for itself.",
+      actionLabel: "Explore Second Fryer Affordability →",
+      actionHref: "/dashboard",
+      badge: "Stage Up",
+    };
   }
-  const top = drafts[0];
-  if (top) return { ruleKey: top.ruleKey, draft: top };
-  return { ruleKey: "onboarding", draft: null };
+
+  // 2. Critical Cash Runway Warning
+  const cashNudge = nudges.find((n) => n.ruleKey === "cash_runway" && n.status === "new");
+  if (cashNudge) {
+    return {
+      title: "Protect Thursday Stock Cash",
+      description: cashNudge.messageEn,
+      actionLabel: "View Cash Flow & Runway Forecast →",
+      actionHref: "/dashboard",
+      badge: "Action Required",
+    };
+  }
+
+  // 3. Margin Drop Alert
+  const marginNudge = nudges.find((n) => n.ruleKey === "margin_drop" && n.status === "new");
+  if (marginNudge) {
+    return {
+      title: "Oil Price Surge: Protect Your Margin",
+      description: marginNudge.messageEn,
+      actionLabel: "Review Costing & Set New Price →",
+      actionHref: "/wizard",
+      badge: "Price Alert",
+    };
+  }
+
+  // 4. Default: Stage Next Best Step
+  return {
+    title: "Continue Building Track Record",
+    description: stageInfo.nextBestStep,
+    actionLabel: "Log Today's Sales →",
+    actionHref: "/log",
+    badge: `Stage: ${stageInfo.currentStage.toUpperCase()}`,
+  };
 }
