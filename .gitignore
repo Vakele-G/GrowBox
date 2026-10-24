@@ -6,4 +6,10 @@ scripts/members.conf
 
 node_modules/
 .next/
+out/
 coverage/
+.data/
+*.tsbuildinfo
+next-env.d.ts
+.DS_Store
+.vercel

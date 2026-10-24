@@ -20,7 +20,7 @@ Repo, agent instructions, and the milestone commit script are in place.
 
 ## M01 — Foundation and live deploy
 
-**Status:** pending
+**Status:** done
 
 **Goal:** A deployed, tooled Next.js PWA skeleton with a public URL.
 
@@ -38,7 +38,7 @@ Repo, agent instructions, and the milestone commit script are in place.
 
 ## M02 — Data model, demo auth and seed
 
-**Status:** pending
+**Status:** in progress
 
 **Goal:** Persistent data with a reproducible demo persona.
 
@@ -182,3 +182,4 @@ logging, dashboard, nudges, stage transition, backup video, credentials.
 ## Milestone Log
 
 Append one line per published milestone: `MID — checks — commit — push`.
+- M01 — lint, typecheck, test, build pass — pending commit — pending push

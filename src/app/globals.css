@@ -1,0 +1,128 @@
+@import "tailwindcss";
+
+@theme {
+  --color-cream: #fbf8f0;
+  --color-paper: #ffffff;
+  --color-ink: #17251e;
+  --color-muted: #5d6f64;
+  --color-line: #e2e5dc;
+  --color-forest: #0b5d3b;
+  --color-forest-dark: #073b28;
+  --color-leaf: #14805c;
+  --color-mint: #e5f3ea;
+  --color-lime: #b6d94c;
+  --color-amber: #e8a317;
+  --color-amber-soft: #fdf3dc;
+  --color-danger: #b4392c;
+  --color-danger-soft: #fbe9e6;
+  --font-sans: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto,
+    "Helvetica Neue", Arial, sans-serif;
+}
+
+@layer base {
+  html {
+    -webkit-text-size-adjust: 100%;
+  }
+  body {
+    background: var(--color-cream);
+    color: var(--color-ink);
+    font-family: var(--font-sans);
+    min-height: 100dvh;
+  }
+  button,
+  a,
+  input,
+  select,
+  textarea {
+    -webkit-tap-highlight-color: transparent;
+  }
+  :focus-visible {
+    outline: 3px solid var(--color-leaf);
+    outline-offset: 2px;
+  }
+}
+
+@layer components {
+  .card {
+    background: var(--color-paper);
+    border: 1px solid var(--color-line);
+    border-radius: 1.25rem;
+    box-shadow: 0 1px 2px rgb(23 37 30 / 0.04);
+  }
+  .btn-primary {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    min-height: 44px;
+    border-radius: 0.9rem;
+    background: var(--color-forest);
+    color: white;
+    font-weight: 600;
+    padding: 0.65rem 1.1rem;
+    transition: background 120ms ease;
+  }
+  .btn-primary:hover {
+    background: var(--color-forest-dark);
+  }
+  .btn-primary:disabled {
+    opacity: 0.55;
+  }
+  .btn-secondary {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    min-height: 44px;
+    border-radius: 0.9rem;
+    border: 1px solid var(--color-line);
+    background: var(--color-paper);
+    color: var(--color-ink);
+    font-weight: 600;
+    padding: 0.65rem 1.1rem;
+  }
+  .field {
+    width: 100%;
+    min-height: 44px;
+    border-radius: 0.8rem;
+    border: 1px solid var(--color-line);
+    background: var(--color-paper);
+    padding: 0.65rem 0.8rem;
+    font-size: 1rem;
+  }
+  .field:focus {
+    border-color: var(--color-leaf);
+  }
+  .label {
+    display: block;
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: var(--color-muted);
+    margin-bottom: 0.35rem;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+  }
+  .pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    border-radius: 999px;
+    padding: 0.2rem 0.65rem;
+    font-size: 0.72rem;
+    font-weight: 600;
+    letter-spacing: 0.02em;
+  }
+}
+
+@media print {
+  .no-print {
+    display: none !important;
+  }
+  body {
+    background: white;
+  }
+  .card {
+    box-shadow: none;
+    break-inside: avoid;
+  }
+}
