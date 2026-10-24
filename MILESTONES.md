@@ -57,7 +57,7 @@ and the demo account shows seeded data after login.
 
 ## M03 — Stage 1 wizard and costing calculator
 
-**Status:** pending
+**Status:** done
 
 **Goal:** The hero feature: cost it, price it, plan the launch.
 
@@ -183,4 +183,5 @@ logging, dashboard, nudges, stage transition, backup video, credentials.
 
 Append one line per published milestone: `MID — checks — commit — push`.
 - M01 — lint, typecheck, test, build pass — 8dcc770 — pushed
-- M02 — lint, typecheck, test, build pass — pending commit — pending push
+- M02 — lint, typecheck, test, build pass — db369ab — pushed
+- M03 — lint, typecheck, test, build pass — pending commit — pending push
