@@ -1,1 +1,9 @@
 scripts/members.conf
+
+.env
+.env.*
+!.env.example
+
+node_modules/
+.next/
+coverage/
