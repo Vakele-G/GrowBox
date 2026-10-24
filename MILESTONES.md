@@ -128,7 +128,7 @@ seeded data, and nudges render correctly with the LLM disabled.
 
 ## M07 — Health Score, FNB mock and credit record
 
-**Status:** pending
+**Status:** done
 
 **Goal:** Turn the ledger into a credit-readiness story.
 
@@ -187,4 +187,5 @@ Append one line per published milestone: `MID — checks — commit — push`.
 - M03 — lint, typecheck, test, build pass — 68edd63 — pushed
 - M04 — lint, typecheck, test, build pass — 314b8eb — pushed
 - M05 — lint, typecheck, test, build pass — dc3ed3d — pushed
-- M06 — lint, typecheck, test, build pass — <pending commit> — pushed
+- M06 — lint, typecheck, test, build pass — 7b2bfa0 — pushed
+- M07 — lint, typecheck, test, build pass — <pending commit> — pending push
