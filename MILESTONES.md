@@ -38,7 +38,7 @@ Repo, agent instructions, and the milestone commit script are in place.
 
 ## M02 — Data model, demo auth and seed
 
-**Status:** in progress
+**Status:** done
 
 **Goal:** Persistent data with a reproducible demo persona.
 
@@ -182,4 +182,5 @@ logging, dashboard, nudges, stage transition, backup video, credentials.
 ## Milestone Log
 
 Append one line per published milestone: `MID — checks — commit — push`.
-- M01 — lint, typecheck, test, build pass — pending commit — pending push
+- M01 — lint, typecheck, test, build pass — 8dcc770 — pushed
+- M02 — lint, typecheck, test, build pass — pending commit — pending push

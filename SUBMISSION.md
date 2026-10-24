@@ -5,6 +5,10 @@ and small-business growth · Category: Best Hackathon Solution
 
 > Figures are cited for judges to verify. Confirm pricing and targets with the
 > team before submitting. Sources are listed at the end.
+>
+> **Demo Access for Judges:**
+> - Demo Login: `demo@growbox.app` (or click "Sign in as Nomsa (Demo)" on the `/login` screen).
+> - Seeded Persona: Nomsa's Kitchen, Soweto, Stage 3 (Stable), with 14–30 days of trading records, realistic margins, and Health Score in the 60–70 band.
 
 ---
 

@@ -3,102 +3,187 @@ import { createSeedData, DEMO_BUSINESS_ID } from "../src/lib/db/seed";
 
 /**
  * Idempotent demo seed: rebuilds Nomsa's Kitchen demo persona and history.
- * Safe to run twice — existing demo rows are removed before insert.
+ * Safe to run multiple times — existing demo rows are removed before insert.
+ *
+ * Usage:
+ *   npx tsx scripts/seed.ts           # seeds full 30-day Stage 3 history
+ *   npx tsx scripts/seed.ts --minimal # seeds minimal Stage 1 idea persona
  */
-async function main() {
+export async function runSeed(mode: "full" | "minimal" = "full") {
   const supabase = createServerSupabaseClient();
-  const data = createSeedData();
+  const data = createSeedData(undefined, mode);
 
-  const { error: deleteError } = await supabase
-    .from("transactions")
-    .delete()
-    .eq("business_id", DEMO_BUSINESS_ID);
-  if (deleteError) throw new Error(deleteError.message);
+  console.log(`Seeding Nomsa's Kitchen in ${mode} mode...`);
 
-  const { error: deletePlanError } = await supabase
-    .from("plan_items")
-    .delete()
-    .eq("business_id", DEMO_BUSINESS_ID);
-  if (deletePlanError) throw new Error(deletePlanError.message);
+  // 1. Clean up existing demo data in dependency order
+  const tablesToClean = [
+    "transactions",
+    "plan_items",
+    "stage_progress",
+    "nudges",
+    "health_scores",
+    "product_ingredients",
+    "products",
+    "ingredients",
+  ];
 
-  const { error: deleteStageError } = await supabase
-    .from("stage_progress")
-    .delete()
-    .eq("business_id", DEMO_BUSINESS_ID);
-  if (deleteStageError) throw new Error(deleteStageError.message);
+  for (const table of tablesToClean) {
+    if (table === "product_ingredients") {
+      // product_ingredients joins through products
+      const { data: prods } = await supabase
+        .from("products")
+        .select("id")
+        .eq("business_id", DEMO_BUSINESS_ID);
+      if (prods && prods.length > 0) {
+        const prodIds = prods.map((p) => p.id);
+        await supabase.from("product_ingredients").delete().in("product_id", prodIds);
+      }
+    } else {
+      await supabase.from(table).delete().eq("business_id", DEMO_BUSINESS_ID);
+    }
+  }
 
-  const { error: deleteProductsError } = await supabase
-    .from("products")
-    .delete()
-    .eq("business_id", DEMO_BUSINESS_ID);
-  if (deleteProductsError) throw new Error(deleteProductsError.message);
+  // Delete business
+  await supabase.from("businesses").delete().eq("id", DEMO_BUSINESS_ID);
 
-  const { error: deleteIngredientsError } = await supabase
-    .from("ingredients")
-    .delete()
-    .eq("business_id", DEMO_BUSINESS_ID);
-  if (deleteIngredientsError) throw new Error(deleteIngredientsError.message);
+  // 2. Insert mapped records with snake_case columns
+  // Businesses
+  const mappedBusinesses = data.businesses.map((b) => ({
+    id: b.id,
+    owner_id: b.ownerId,
+    name: b.name,
+    stage: b.stage,
+    municipality: b.municipality,
+    language: b.language,
+    monthly_budget_cents: b.monthlyBudgetCents,
+    onboarding: b.onboarding,
+    created_at: b.createdAt,
+  }));
+  const { error: bErr } = await supabase.from("businesses").insert(mappedBusinesses);
+  if (bErr) throw new Error(`Business insert failed: ${bErr.message}`);
 
-  const { error: deleteNudgesError } = await supabase
-    .from("nudges")
-    .delete()
-    .eq("business_id", DEMO_BUSINESS_ID);
-  if (deleteNudgesError) throw new Error(deleteNudgesError.message);
+  // Products
+  const mappedProducts = data.products.map((p) => ({
+    id: p.id,
+    business_id: p.businessId,
+    name: p.name,
+    unit_label: p.unitLabel,
+    selling_price_cents: p.sellingPriceCents,
+    batch_yield: p.batchYield,
+    is_active: p.isActive,
+  }));
+  const { error: pErr } = await supabase.from("products").insert(mappedProducts);
+  if (pErr) throw new Error(`Products insert failed: ${pErr.message}`);
 
-  const { error: deleteScoresError } = await supabase
-    .from("health_scores")
-    .delete()
-    .eq("business_id", DEMO_BUSINESS_ID);
-  if (deleteScoresError) throw new Error(deleteScoresError.message);
+  // Ingredients
+  const mappedIngredients = data.ingredients.map((i) => ({
+    id: i.id,
+    business_id: i.businessId,
+    name: i.name,
+    pack_size: i.packSize,
+    pack_unit: i.packUnit,
+    pack_price_cents: i.packPriceCents,
+    last_price_change_at: i.lastPriceChangeAt,
+  }));
+  const { error: iErr } = await supabase.from("ingredients").insert(mappedIngredients);
+  if (iErr) throw new Error(`Ingredients insert failed: ${iErr.message}`);
 
-  const { error: deleteBusinessError } = await supabase
-    .from("businesses")
-    .delete()
-    .eq("id", DEMO_BUSINESS_ID);
-  if (deleteBusinessError) throw new Error(deleteBusinessError.message);
+  // Product Ingredients
+  const mappedProductIngredients = data.productIngredients.map((pi) => ({
+    product_id: pi.productId,
+    ingredient_id: pi.ingredientId,
+    qty_per_unit: pi.qtyPerUnit,
+  }));
+  if (mappedProductIngredients.length > 0) {
+    const { error: piErr } = await supabase
+      .from("product_ingredients")
+      .insert(mappedProductIngredients);
+    if (piErr) throw new Error(`Product ingredients insert failed: ${piErr.message}`);
+  }
 
-  const { error: insertBusinessError } = await supabase.from("businesses").insert(data.businesses);
-  if (insertBusinessError) throw new Error(insertBusinessError.message);
+  // Transactions
+  if (data.transactions.length > 0) {
+    const mappedTransactions = data.transactions.map((t) => ({
+      id: t.id,
+      business_id: t.businessId,
+      occurred_on: t.occurredOn,
+      type: t.type,
+      category: t.category,
+      amount_cents: t.amountCents,
+      description: t.description,
+      product_id: t.productId,
+      quantity: t.quantity,
+      source: t.source,
+      external_id: t.externalId,
+      confidence: t.confidence,
+      created_at: t.createdAt,
+    }));
+    const { error: tErr } = await supabase.from("transactions").insert(mappedTransactions);
+    if (tErr) throw new Error(`Transactions insert failed: ${tErr.message}`);
+  }
 
-  const { error: insertProductsError } = await supabase
-    .from("products")
-    .insert(data.products);
-  if (insertProductsError) throw new Error(insertProductsError.message);
+  // Plan Items
+  if (data.planItems.length > 0) {
+    const mappedPlanItems = data.planItems.map((pi) => ({
+      id: pi.id,
+      business_id: pi.businessId,
+      kind: pi.kind,
+      label: pi.label,
+      est_cost_cents: pi.estCostCents,
+      status: pi.status,
+      sort_order: pi.sortOrder,
+    }));
+    const { error: plErr } = await supabase.from("plan_items").insert(mappedPlanItems);
+    if (plErr) throw new Error(`Plan items insert failed: ${plErr.message}`);
+  }
 
-  const { error: insertIngredientsError } = await supabase
-    .from("ingredients")
-    .insert(data.ingredients);
-  if (insertIngredientsError) throw new Error(insertIngredientsError.message);
+  // Stage Progress
+  if (data.stageProgress.length > 0) {
+    const mappedStageProgress = data.stageProgress.map((sp) => ({
+      business_id: sp.businessId,
+      stage: sp.stage,
+      stage_started_at: sp.stageStartedAt,
+      completed_checks: sp.completedChecks,
+      updated_at: sp.updatedAt,
+    }));
+    const { error: spErr } = await supabase
+      .from("stage_progress")
+      .insert(mappedStageProgress);
+    if (spErr) throw new Error(`Stage progress insert failed: ${spErr.message}`);
+  }
 
-  const { error: insertProductIngredientsError } = await supabase
-    .from("product_ingredients")
-    .insert(data.productIngredients);
-  if (insertProductIngredientsError) throw new Error(insertProductIngredientsError.message);
+  // Knowledge Chunks (upsert so running multiple times is safe)
+  if (data.knowledgeChunks.length > 0) {
+    const mappedKnowledge = data.knowledgeChunks.map((kc) => ({
+      id: kc.id,
+      jurisdiction: kc.jurisdiction,
+      topic: kc.topic,
+      title: kc.title,
+      requirement: kc.requirement,
+      source_url: kc.sourceUrl,
+      last_verified: kc.lastVerified,
+      disclaimer: kc.disclaimer,
+    }));
+    const { error: kcErr } = await supabase
+      .from("knowledge_chunks")
+      .upsert(mappedKnowledge, { onConflict: "id" });
+    if (kcErr) throw new Error(`Knowledge chunks upsert failed: ${kcErr.message}`);
+  }
 
-  const { error: insertTransactionsError } = await supabase
-    .from("transactions")
-    .insert(data.transactions);
-  if (insertTransactionsError) throw new Error(insertTransactionsError.message);
-
-  const { error: insertPlanError } = await supabase.from("plan_items").insert(data.planItems);
-  if (insertPlanError) throw new Error(insertPlanError.message);
-
-  const { error: insertStageError } = await supabase
-    .from("stage_progress")
-    .insert(data.stageProgress);
-  if (insertStageError) throw new Error(insertStageError.message);
-
-  const { error: insertKnowledgeError } = await supabase
-    .from("knowledge_chunks")
-    .insert(data.knowledgeChunks);
-  if (insertKnowledgeError) throw new Error(insertKnowledgeError.message);
-
-  console.log("Seed complete: Nomsa's Kitchen demo persona restored.");
+  console.log(`Seed complete: Nomsa's Kitchen (${mode} mode) successfully restored.`);
 }
 
-main()
-  .then(() => process.exit(0))
-  .catch((error: unknown) => {
-    console.error(error);
-    process.exit(1);
-  });
+const isDirectRun =
+  typeof process !== "undefined" &&
+  process.argv[1] &&
+  (process.argv[1].endsWith("seed.ts") || process.argv[1].endsWith("seed.js"));
+
+if (isDirectRun) {
+  const mode = process.argv.includes("--minimal") ? "minimal" : "full";
+  runSeed(mode)
+    .then(() => process.exit(0))
+    .catch((error: unknown) => {
+      console.error("Seed error:", error);
+      process.exit(1);
+    });
+}

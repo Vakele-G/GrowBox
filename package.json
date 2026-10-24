@@ -10,7 +10,7 @@
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
     "test:watch": "vitest",
-    "seed": "tsx src/lib/db/seed.ts"
+    "seed": "tsx scripts/seed.ts"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.50.0",

@@ -45,45 +45,69 @@ export interface SeedData {
   seedVersion: number;
 }
 
-export function createSeedData(now: string = today()): SeedData {
+export function createSeedData(
+  now: string = today(),
+  mode: "full" | "minimal" = "full",
+): SeedData {
   const ownerId = DEMO_OWNER_ID;
   const businessId = DEMO_BUSINESS_ID;
-  const createdAt = addDays(now, -45);
+  const isMinimal = mode === "minimal";
+  const createdAt = isMinimal ? now : addDays(now, -45);
 
-  const business: Business = {
-    id: businessId,
-    ownerId,
-    name: "Nomsa's Kitchen",
-    stage: "stable",
-    municipality: "Soweto, City of Johannesburg",
-    language: "en",
-    monthlyBudgetCents: 150_000,
-    createdAt,
-    onboarding: {
-      completed: true,
-      completedAt: createdAt,
-      location: "Soweto, Johannesburg",
-      budgetCents: 150_000,
-      equipment: ["Gas stove", "Pot", "Gas cylinder", "Display table"],
-      customers: "Taxi commuters in the morning and learners after school",
-      launchDate: addDays(now, -40),
-      stockUnitsOnHand: 120,
-      separatedMoney: false,
-      practicality: {
-        viable: true,
-        notes: [
-          "Morning commuters and after-school learners give you two reliable peaks.",
-          "Your startup budget covers the first ingredient pack and gas.",
-        ],
-      },
-      launchPlan: [
-        "Buy the first flour, oil and potato pack from your nearest wholesaler.",
-        "Confirm a trading spot with the stall owner or municipality.",
-        "Complete a food-handling course and keep the certificate.",
-        "Keep a daily cash book from day one and log every sale.",
-      ],
-    },
-  };
+  const business: Business = isMinimal
+    ? {
+        id: businessId,
+        ownerId,
+        name: "Nomsa's Kitchen",
+        stage: "idea",
+        municipality: "Soweto, City of Johannesburg",
+        language: "en",
+        monthlyBudgetCents: 150_000,
+        createdAt,
+        onboarding: {
+          completed: false,
+          location: "Soweto, Johannesburg",
+          budgetCents: 150_000,
+          equipment: ["Gas stove", "Pot", "Gas cylinder"],
+          customers: "Taxi commuters in the morning",
+          stockUnitsOnHand: 0,
+          separatedMoney: false,
+        },
+      }
+    : {
+        id: businessId,
+        ownerId,
+        name: "Nomsa's Kitchen",
+        stage: "stable",
+        municipality: "Soweto, City of Johannesburg",
+        language: "en",
+        monthlyBudgetCents: 150_000,
+        createdAt,
+        onboarding: {
+          completed: true,
+          completedAt: createdAt,
+          location: "Soweto, Johannesburg",
+          budgetCents: 150_000,
+          equipment: ["Gas stove", "Pot", "Gas cylinder", "Display table"],
+          customers: "Taxi commuters in the morning and learners after school",
+          launchDate: addDays(now, -40),
+          stockUnitsOnHand: 120,
+          separatedMoney: false,
+          practicality: {
+            viable: true,
+            notes: [
+              "Morning commuters and after-school learners give you two reliable peaks.",
+              "Your startup budget covers the first ingredient pack and gas.",
+            ],
+          },
+          launchPlan: [
+            "Buy the first flour, oil and potato pack from your nearest wholesaler.",
+            "Confirm a trading spot with the stall owner or municipality.",
+            "Complete a food-handling course and keep the certificate.",
+            "Keep a daily cash book from day one and log every sale.",
+          ],
+        },
+      };
 
   const products: Product[] = [
     {
@@ -226,7 +250,8 @@ export function createSeedData(now: string = today()): SeedData {
     oil: 26_000,
   };
 
-  for (let offset = 29; offset >= 0; offset -= 1) {
+  if (!isMinimal) {
+    for (let offset = 29; offset >= 0; offset -= 1) {
     const date = addDays(now, -offset);
     const factor = dayFactor(weekdayIndex(date));
     const gwinyaQty = Math.max(20, Math.round(65 * factor) + jitter(offset));
@@ -362,17 +387,18 @@ export function createSeedData(now: string = today()): SeedData {
   );
   const targetCash = 255_000;
   if (cashBeforeDraw > targetCash) {
-    push({
-      occurredOn: addDays(now, -1),
-      type: "expense",
-      category: "owner-draw",
-      amountCents: cashBeforeDraw - targetCash,
-      description: "Owner withdrawal to personal wallet",
-      productId: null,
-      quantity: null,
-      source: "manual",
-    });
-  }
+        push({
+          occurredOn: addDays(now, -1),
+          type: "expense",
+          category: "owner-draw",
+          amountCents: cashBeforeDraw - targetCash,
+          description: "Owner withdrawal to personal wallet",
+          productId: null,
+          quantity: null,
+          source: "manual",
+        });
+      }
+    }
 
   const planItems: PlanItem[] = [
     {
@@ -381,7 +407,7 @@ export function createSeedData(now: string = today()): SeedData {
       kind: "equipment",
       label: "Gas stove (already owned)",
       estCostCents: 65_000,
-      status: "done",
+      status: isMinimal ? "todo" : "done",
       sortOrder: 1,
     },
     {
@@ -390,7 +416,7 @@ export function createSeedData(now: string = today()): SeedData {
       kind: "equipment",
       label: "Large cooking pot (already owned)",
       estCostCents: 18_000,
-      status: "done",
+      status: isMinimal ? "todo" : "done",
       sortOrder: 2,
     },
     {
@@ -399,7 +425,7 @@ export function createSeedData(now: string = today()): SeedData {
       kind: "equipment",
       label: "Gas cylinder (already owned)",
       estCostCents: 45_000,
-      status: "done",
+      status: isMinimal ? "todo" : "done",
       sortOrder: 3,
     },
     {
@@ -449,20 +475,30 @@ export function createSeedData(now: string = today()): SeedData {
     },
   ];
 
-  const stageProgress: StageProgress[] = [
-    {
-      businessId,
-      stage: "stable",
-      stageStartedAt: addDays(now, -35),
-      completedChecks: [
-        "food_handling",
-        "trading_spot",
-        "supplier_list",
-        "recordkeeping",
-      ],
-      updatedAt: now,
-    },
-  ];
+  const stageProgress: StageProgress[] = isMinimal
+    ? [
+        {
+          businessId,
+          stage: "idea",
+          stageStartedAt: now,
+          completedChecks: [],
+          updatedAt: now,
+        },
+      ]
+    : [
+        {
+          businessId,
+          stage: "stable",
+          stageStartedAt: addDays(now, -35),
+          completedChecks: [
+            "food_handling",
+            "trading_spot",
+            "supplier_list",
+            "recordkeeping",
+          ],
+          updatedAt: now,
+        },
+      ];
 
   const disclaimer = "Verify with your municipality before you trade.";
   const knowledgeChunks: KnowledgeChunk[] = [
