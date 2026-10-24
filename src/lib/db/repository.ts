@@ -825,7 +825,7 @@ export function getRepository(): Repository {
     process.env.VITEST === "true";
 
   if (isPlaceholder) {
-    const seedMode = process.env.SEED_MODE === "minimal" ? "minimal" : "full";
+    const seedMode = process.env.SEED_MODE === "full" ? "full" : "minimal";
     activeRepository = new MemoryRepository(createSeedData(undefined, seedMode));
   } else {
     activeRepository = new SupabaseRepository();

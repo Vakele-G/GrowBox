@@ -47,7 +47,7 @@ export interface SeedData {
 
 export function createSeedData(
   now: string = today(),
-  mode: "full" | "minimal" = "full",
+  mode: "full" | "minimal" = "minimal",
 ): SeedData {
   const ownerId = DEMO_OWNER_ID;
   const businessId = DEMO_BUSINESS_ID;

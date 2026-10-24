@@ -90,7 +90,7 @@ describe("M02 — Data Model, Seed and Repository Layer", () => {
   });
 
   it("filters transactions by date range and limit", async () => {
-    const repo = createMemoryRepository();
+    const repo = createMemoryRepository(createSeedData("2026-10-24", "full"));
     const all = await repo.getTransactions(DEMO_BUSINESS_ID);
     expect(all.length).toBeGreaterThan(10);
 
@@ -99,7 +99,7 @@ describe("M02 — Data Model, Seed and Repository Layer", () => {
   });
 
   it("manages stage progress and plan items", async () => {
-    const repo = createMemoryRepository();
+    const repo = createMemoryRepository(createSeedData("2026-10-24", "full"));
     const stage = await repo.getStageProgress(DEMO_BUSINESS_ID);
     expect(stage?.stage).toBe("stable");
 

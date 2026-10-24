@@ -27,7 +27,7 @@ export default async function HomePage() {
     id: DEMO_BUSINESS_ID,
     ownerId: "demo_owner",
     name: "Nomsa's Kitchen",
-    stage: "stable",
+    stage: "idea",
     municipality: "City of Johannesburg",
     language: "en",
     monthlyBudgetCents: 150_000,
