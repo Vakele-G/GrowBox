@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { redirect } from "next/navigation";
 import type { Route } from "next";
 import { BottomNav } from "@/components/bottom-nav";
 import { LanguageSwitcher } from "@/components/language-switcher";
@@ -14,7 +15,10 @@ import { determineNextBestStep, generateNudges } from "@/lib/domain/nudges";
 import { detectStage } from "@/lib/domain/stage";
 import type { Business, Language } from "@/lib/domain/types";
 
-export default async function HomePage() {
+export default async function HomePage(props: {
+  searchParams?: Promise<{ skip?: string }>;
+}) {
+  const searchParams = props.searchParams ? await props.searchParams : undefined;
   const repo = getRepository();
   const rawBusiness = await repo.getBusiness(DEMO_BUSINESS_ID);
   const stageProgress = await repo.getStageProgress(DEMO_BUSINESS_ID);
@@ -34,6 +38,11 @@ export default async function HomePage() {
     onboarding: null,
     createdAt: "2026-09-01T00:00:00+02:00",
   };
+
+  // If onboarding hasn't been completed yet, start user on the Stage 0/1 Onboarding Wizard
+  if (!business.onboarding?.completed && searchParams?.skip !== "true") {
+    redirect("/wizard");
+  }
 
   const language: Language = business.language ?? "en";
   const costing = business.onboarding?.costing;

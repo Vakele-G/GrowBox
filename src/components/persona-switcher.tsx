@@ -1,6 +1,8 @@
 "use client";
 
 import { useTransition } from "react";
+import { useRouter } from "next/navigation";
+import type { Route } from "next";
 import { resetDemoPersonaAction } from "@/app/actions/demo";
 import type { Stage } from "@/lib/domain/types";
 
@@ -9,6 +11,7 @@ interface PersonaSwitcherProps {
 }
 
 export function PersonaSwitcher({ currentStage }: PersonaSwitcherProps) {
+  const router = useRouter();
   const [isPending, startTransition] = useTransition();
 
   const isStage1 = currentStage === "idea";
@@ -16,6 +19,12 @@ export function PersonaSwitcher({ currentStage }: PersonaSwitcherProps) {
   const handleToggle = () => {
     startTransition(async () => {
       await resetDemoPersonaAction(isStage1 ? "full" : "minimal");
+      if (isStage1) {
+        router.push("/" as Route);
+      } else {
+        router.push("/wizard" as Route);
+      }
+      router.refresh();
     });
   };
 
