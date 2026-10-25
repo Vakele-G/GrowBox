@@ -2,6 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 import { getRepository, MemoryRepository } from "@/lib/db/repository";
+import { runSeed } from "@/lib/db/seed-run";
 import { createSeedData } from "@/lib/db/seed";
 
 /**
@@ -14,6 +15,9 @@ export async function resetDemoPersonaAction(mode: "minimal" | "full"): Promise<
 
   if (repo instanceof MemoryRepository) {
     repo.reset(createSeedData(undefined, mode));
+  } else {
+    // Supabase-backed: the persona lives in the database, so rebuild it there.
+    await runSeed(mode);
   }
 
   revalidatePath("/");

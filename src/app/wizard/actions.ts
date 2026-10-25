@@ -9,32 +9,48 @@ export async function saveStage1Plan(data: Stage1Submission) {
   const repo = getRepository();
   const businessId = DEMO_BUSINESS_ID;
 
-  // 1. Update business onboarding
+  // 1. Update business onboarding (create the business row first if the
+  //    database is fresh — otherwise every insert below fails its foreign key)
+  const onboarding = {
+    completed: true,
+    completedAt: new Date().toISOString(),
+    location: data.location,
+    budgetCents: data.budgetCents,
+    equipment: data.equipmentOwned,
+    customers: data.customers,
+    practicality: {
+      viable: data.viable,
+      notes: data.notes,
+    },
+    costing: {
+      productId: "prod_amagwinya",
+      costPerUnitCents: data.unitCostCents,
+      suggestedPriceCents: data.sellingPriceCents,
+      marginPct: data.grossMarginPct,
+      breakEvenUnitsPerDay: data.breakEvenUnitsPerDay,
+    },
+    launchPlan: data.launchPlan,
+  };
+  const businessUpdates = {
+    municipality: data.location,
+    monthlyBudgetCents: data.budgetCents,
+    onboarding,
+  };
+
   const business = await repo.getBusiness(businessId);
   if (business) {
-    await repo.updateBusiness(businessId, {
-      municipality: data.location,
-      monthlyBudgetCents: data.budgetCents,
-      onboarding: {
-        completed: true,
-        completedAt: new Date().toISOString(),
-        location: data.location,
-        budgetCents: data.budgetCents,
-        equipment: data.equipmentOwned,
-        customers: data.customers,
-        practicality: {
-          viable: data.viable,
-          notes: data.notes,
-        },
-        costing: {
-          productId: "prod_amagwinya",
-          costPerUnitCents: data.unitCostCents,
-          suggestedPriceCents: data.sellingPriceCents,
-          marginPct: data.grossMarginPct,
-          breakEvenUnitsPerDay: data.breakEvenUnitsPerDay,
-        },
-        launchPlan: data.launchPlan,
-      },
+    await repo.updateBusiness(businessId, businessUpdates);
+  } else {
+    // ownerId "" is written as NULL (see db/uuid.ts): no auth user is known
+    // in this code path, and the column requires a real uuid or nothing.
+    await repo.saveBusiness({
+      id: businessId,
+      ownerId: "",
+      name: "Nomsa's Kitchen",
+      stage: "idea",
+      language: "en",
+      createdAt: new Date().toISOString(),
+      ...businessUpdates,
     });
   }
 

@@ -107,7 +107,15 @@ npm run build      # production build
 npm run lint       # ESLint
 npm run typecheck  # tsc --noEmit
 npm run test       # Vitest
+npm run seed       # rebuild demo data (-- --minimal for the Stage 1 persona)
 ```
+
+First run against an empty Supabase project:
+
+1. Paste `supabase/migrations/20261024000000_init.sql` into the Supabase
+   **SQL Editor** and run it (creates the tables and RLS policies).
+2. `npm run seed` — loads `.env` itself, creates the `demo@growbox.app` auth
+   user if missing, and is safe to re-run.
 
 **Never commit `.env`.** Secrets live only in local env files and Vercel
 environment variables.

@@ -1,5 +1,6 @@
 import { createBrowserSupabaseClient, createServerSupabaseClient } from "./client";
 import { createSeedData } from "./seed";
+import { toOwnerIdColumn } from "./uuid";
 import type {
   Business,
   HealthScore,
@@ -317,7 +318,7 @@ export class SupabaseRepository implements Repository {
     if (error || !data) return null;
     return {
       id: data.id,
-      ownerId: data.owner_id,
+      ownerId: data.owner_id ?? "",
       name: data.name,
       stage: data.stage,
       municipality: data.municipality,
@@ -338,7 +339,7 @@ export class SupabaseRepository implements Repository {
     if (error || !data) return null;
     return {
       id: data.id,
-      ownerId: data.owner_id,
+      ownerId: data.owner_id ?? "",
       name: data.name,
       stage: data.stage,
       municipality: data.municipality,
@@ -352,7 +353,7 @@ export class SupabaseRepository implements Repository {
   async saveBusiness(business: Business): Promise<void> {
     const { error } = await this.client.from("businesses").upsert({
       id: business.id,
-      owner_id: business.ownerId,
+      owner_id: toOwnerIdColumn(business.ownerId),
       name: business.name,
       stage: business.stage,
       municipality: business.municipality,
@@ -384,7 +385,7 @@ export class SupabaseRepository implements Repository {
     if (error || !data) throw new Error(error?.message ?? "Update failed");
     return {
       id: data.id,
-      ownerId: data.owner_id,
+      ownerId: data.owner_id ?? "",
       name: data.name,
       stage: data.stage,
       municipality: data.municipality,

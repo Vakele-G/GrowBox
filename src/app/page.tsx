@@ -40,6 +40,13 @@ export default async function HomePage(props: {
     createdAt: "2026-09-01T00:00:00+02:00",
   };
 
+  // Fresh database: persist the fallback row so every write below it
+  // (nudges, products, plan items, stage progress) has a businesses row
+  // to reference instead of failing on a foreign key.
+  if (!rawBusiness) {
+    await repo.saveBusiness(business);
+  }
+
   // If onboarding hasn't been completed yet, start user on the Stage 0/1 Onboarding Wizard
   if (!business.onboarding?.completed && searchParams?.skip !== "true") {
     redirect("/wizard");
