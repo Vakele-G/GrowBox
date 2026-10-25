@@ -779,13 +779,18 @@ export class SupabaseRepository implements Repository {
   }
 
   async saveHealthScore(score: HealthScore): Promise<void> {
-    const { error } = await this.client.from("health_scores").insert({
-      id: score.id,
-      business_id: score.businessId,
-      score: score.score,
-      components: score.components,
-      computed_at: score.computedAt,
-    });
+    // The caller writes a single "latest" snapshot under a fixed id, so this
+    // must upsert — an insert makes every visit after the first a 500.
+    const { error } = await this.client.from("health_scores").upsert(
+      {
+        id: score.id,
+        business_id: score.businessId,
+        score: score.score,
+        components: score.components,
+        computed_at: score.computedAt,
+      },
+      { onConflict: "id" },
+    );
     if (error) throw new Error(error.message);
   }
 
