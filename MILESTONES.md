@@ -196,3 +196,4 @@ Append one line per published milestone: `MID — checks — commit — push`.
 - S02 — lint, typecheck, test, build pass — f4fbf48 — pushed
 - S03 — lint, typecheck, test, build pass — 9f75685 — pushed
 - S04 — lint, typecheck, test, build pass — 184f66a — pushed
+- S05 — lint, typecheck, test, build pass — 1a53cbf — pushed (https://grow-box.vercel.app live)
