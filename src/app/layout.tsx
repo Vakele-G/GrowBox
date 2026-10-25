@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import { cookies } from "next/headers";
 import { Plus_Jakarta_Sans } from "next/font/google";
+import { AuthGate } from "@/components/auth-gate";
 import { PwaRegister } from "@/components/pwa-register";
 import "./globals.css";
 
@@ -45,7 +46,9 @@ export default async function RootLayout({
           aria-hidden
           className="pointer-events-none fixed inset-x-0 top-0 -z-10 h-80 bg-[radial-gradient(60%_100%_at_50%_0%,rgb(33_150_243/0.22),transparent_70%)]"
         />
-        <div className="relative mx-auto w-full max-w-[520px] px-4 pb-28 pt-4">{children}</div>
+        <div className="relative mx-auto w-full max-w-[520px] px-4 pb-28 pt-4">
+          <AuthGate lang={isIsiZulu ? "zu" : "en"}>{children}</AuthGate>
+        </div>
         <PwaRegister />
       </body>
     </html>
