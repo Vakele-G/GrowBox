@@ -173,7 +173,13 @@ in the demo.
 ### 6.8 Language and accessibility
 - English and isiZulu UI, language switcher, persisted choice.
 - Currency `en-ZA`, dates `Africa/Johannesburg`.
-- Text-first, low-data design; no decorative media required.
+- Text-first, low-data design; no photographic or media assets.
+- Visual identity: blue brand palette (#E3F2FD canvas, #90CAF9 sky,
+  #2196F3 accent, #0D47A1 brand) on white cards with navy ink; dark-blue
+  hero band for screen headers; blue-tinted shadows; CSS-only micro-motion
+  (rise/grow/pop, press states) gated by `motion-safe` / reduced-motion.
+- #0D47A1 carries small text; #2196F3 and #90CAF9 are fills/chips/gradients
+  only; amber and red stay functional status colours.
 - Tap targets ≥ 44px, readable contrast, no colour-only status cues.
 
 ---

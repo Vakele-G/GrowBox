@@ -4,6 +4,7 @@ import { useState, useTransition } from "react";
 import Link from "next/link";
 import type { Route } from "next";
 import { importFnbStatementAction } from "@/app/actions/fnb";
+import { HeroBand } from "@/components/hero-band";
 import { Card, Pill, SectionTitle } from "@/components/ui";
 import type { FnbStatementLine } from "@/lib/domain/fnb";
 
@@ -32,19 +33,21 @@ export function ImportView({ lines }: ImportViewProps) {
       <div className="flex items-center justify-between">
         <Link
           href={"/health" as Route}
-          className="text-xs font-bold text-forest hover:underline flex items-center gap-1"
+          className="text-xs font-bold text-brand hover:underline flex items-center gap-1"
         >
           ← Back to Health Score
         </Link>
         <Pill tone="amber">Simulated FNB feed</Pill>
       </div>
 
-      <header className="space-y-1">
-        <h1 className="text-2xl font-bold text-ink">FNB Statement Import</h1>
-        <p className="text-xs text-muted">
-          Import statement-shaped lines through the same ledger pipeline as manual entries.
-        </p>
-      </header>
+      <div className="motion-safe:animate-rise">
+        <HeroBand
+          eyebrow="Simulated FNB feed"
+          title="FNB Statement Import"
+          subtitle="Import statement-shaped lines through the same ledger pipeline as manual entries."
+          action={<Pill tone="amber">Demo data</Pill>}
+        />
+      </div>
 
       {/* Demonstration notice */}
       <div className="rounded-xl border border-amber/30 bg-amber/10 p-3.5 space-y-1">
@@ -59,8 +62,8 @@ export function ImportView({ lines }: ImportViewProps) {
 
       {/* Result Alert if imported */}
       {result && (
-        <div className="rounded-xl border border-leaf/40 bg-mint/30 p-4 space-y-1">
-          <p className="text-xs font-bold text-forest">
+        <div className="rounded-xl border border-accent/40 bg-mist/30 p-4 space-y-1">
+          <p className="text-xs font-bold text-brand">
             ✓ Ingestion Pipeline Completed
           </p>
           <p className="text-xs text-ink">
@@ -68,7 +71,7 @@ export function ImportView({ lines }: ImportViewProps) {
             <strong>{result.skipped}</strong> existing lines with duplicate external IDs.
           </p>
           <div className="pt-2 flex gap-3 text-xs">
-            <Link href={"/ledger" as Route} className="font-bold text-forest hover:underline">
+            <Link href={"/ledger" as Route} className="font-bold text-brand hover:underline">
               View in Ledger →
             </Link>
             <Link href={"/health" as Route} className="font-bold text-ink hover:underline">
@@ -108,10 +111,14 @@ export function ImportView({ lines }: ImportViewProps) {
 
                 <div className="text-right">
                   <span
-                    className={`font-bold ${
-                      isCredit ? "text-forest" : "text-amber-800"
+                    className={`flex items-center justify-end gap-1.5 font-bold ${
+                      isCredit ? "text-brand" : "text-amber-ink"
                     }`}
                   >
+                    <span
+                      className={`h-1.5 w-1.5 rounded-full ${isCredit ? "bg-accent" : "bg-amber"}`}
+                      aria-hidden
+                    />
                     {isCredit ? "+" : "-"}R{(line.amountCents / 100).toFixed(2)}
                   </span>
                   <p className="text-[9px] uppercase font-bold text-muted">

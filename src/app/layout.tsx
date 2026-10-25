@@ -1,7 +1,14 @@
 import type { Metadata, Viewport } from "next";
 import { cookies } from "next/headers";
+import { Plus_Jakarta_Sans } from "next/font/google";
 import { PwaRegister } from "@/components/pwa-register";
 import "./globals.css";
+
+const jakarta = Plus_Jakarta_Sans({
+  subsets: ["latin"],
+  display: "swap",
+  variable: "--font-jakarta",
+});
 
 export const metadata: Metadata = {
   title: {
@@ -21,7 +28,7 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  themeColor: "#0b5d3b",
+  themeColor: "#0d47a1",
 };
 
 export default async function RootLayout({
@@ -32,9 +39,13 @@ export default async function RootLayout({
   const isIsiZulu = lang === "zu";
 
   return (
-    <html lang={isIsiZulu ? "zu" : "en"} suppressHydrationWarning>
-      <body className="min-h-dvh bg-cream font-sans text-ink antialiased">
-        <div className="mx-auto w-full max-w-[520px] px-4 pb-28 pt-4">{children}</div>
+    <html lang={isIsiZulu ? "zu" : "en"} className={jakarta.variable} suppressHydrationWarning>
+      <body className="min-h-dvh bg-canvas font-sans text-ink antialiased">
+        <div
+          aria-hidden
+          className="pointer-events-none fixed inset-x-0 top-0 -z-10 h-80 bg-[radial-gradient(60%_100%_at_50%_0%,rgb(33_150_243/0.22),transparent_70%)]"
+        />
+        <div className="relative mx-auto w-full max-w-[520px] px-4 pb-28 pt-4">{children}</div>
         <PwaRegister />
       </body>
     </html>

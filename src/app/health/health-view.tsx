@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import type { Route } from "next";
+import { HeroBand } from "@/components/hero-band";
 import { Card, Pill, SectionTitle } from "@/components/ui";
 import { BAND_LABELS, type HealthResult } from "@/lib/domain/health";
 import type { Business, BusinessMetrics } from "@/lib/domain/types";
@@ -13,10 +14,10 @@ interface HealthViewProps {
 }
 
 export function HealthView({ business, metrics, health }: HealthViewProps) {
-  const bandTones: Record<string, "green" | "lime" | "amber"> = {
-    ready: "green",
-    bankable: "green",
-    emerging: "lime",
+  const bandTones: Record<string, "brand" | "sky" | "amber"> = {
+    ready: "brand",
+    bankable: "brand",
+    emerging: "sky",
     building: "amber",
   };
 
@@ -25,26 +26,50 @@ export function HealthView({ business, metrics, health }: HealthViewProps) {
   return (
     <div className="space-y-5 pb-12">
       {/* Screen Header */}
-      <header className="space-y-1">
-        <div className="flex items-center justify-between">
-          <p className="text-xs font-bold uppercase tracking-wide text-leaf">GrowBox Credit Signal</p>
-          <Pill tone={currentTone}>{BAND_LABELS[health.band]}</Pill>
-        </div>
-        <h1 className="text-2xl font-bold text-ink">Business Health Score</h1>
-        <p className="text-xs text-muted">
-          A deterministic credit-readiness signal built from {business.name}&apos;s verified paper trail.
-        </p>
-      </header>
+      <div className="motion-safe:animate-rise">
+        <HeroBand
+          eyebrow="GrowBox Credit Signal"
+          title="Business Health Score"
+          subtitle={`A deterministic credit-readiness signal built from ${business.name}'s verified paper trail.`}
+          action={<Pill tone={currentTone}>{BAND_LABELS[health.band]}</Pill>}
+        />
+      </div>
 
       {/* Hero Score Card */}
-      <Card className="p-6 text-center space-y-4 border-leaf/40 bg-gradient-to-b from-mint/20 to-paper">
+      <Card className="motion-safe:animate-rise p-6 text-center space-y-4 border-sky/50 bg-gradient-to-b from-mist/40 to-paper">
         <div>
-          <p className="text-xs font-bold uppercase tracking-wider text-forest">Overall Health Score</p>
-          <div className="flex items-baseline justify-center gap-1.5 mt-2">
-            <span className="text-5xl font-black text-ink">{health.score}</span>
-            <span className="text-base font-bold text-muted">/ 100</span>
+          <p className="text-xs font-bold uppercase tracking-wider text-brand">Overall Health Score</p>
+          <div className="relative mx-auto mt-3 h-36 w-36">
+            <svg viewBox="0 0 120 120" className="h-full w-full -rotate-90" aria-hidden>
+              <defs>
+                <linearGradient id="scoreGrad" x1="0" y1="0" x2="1" y2="1">
+                  <stop offset="0%" stopColor="#90caf9" />
+                  <stop offset="55%" stopColor="#2196f3" />
+                  <stop offset="100%" stopColor="#0d47a1" />
+                </linearGradient>
+              </defs>
+              <circle cx="60" cy="60" r="52" fill="none" stroke="#e3f2fd" strokeWidth="10" />
+              <circle
+                cx="60"
+                cy="60"
+                r="52"
+                fill="none"
+                stroke="url(#scoreGrad)"
+                strokeWidth="10"
+                strokeLinecap="round"
+                pathLength={100}
+                strokeDasharray={`${health.score} 100`}
+                className="motion-safe:transition-[stroke-dasharray] motion-safe:duration-700"
+              />
+            </svg>
+            <div className="absolute inset-0 flex flex-col items-center justify-center">
+              <span className="bg-gradient-to-br from-accent to-brand bg-clip-text text-5xl font-black text-transparent">
+                {health.score}
+              </span>
+              <span className="text-xs font-bold text-muted">/ 100</span>
+            </div>
           </div>
-          <div className="mt-2 flex justify-center">
+          <div className="mt-3 flex justify-center">
             <Pill tone={currentTone}>
               Band: {BAND_LABELS[health.band]} (
               {health.band === "ready"
@@ -94,11 +119,11 @@ export function HealthView({ business, metrics, health }: HealthViewProps) {
           <div className="space-y-1">
             <div className="flex justify-between text-xs">
               <span className="font-semibold text-ink">Profitability (4-week gross margin)</span>
-              <span className="font-bold text-forest">{health.components.profitability} / 25 pts</span>
+              <span className="font-bold text-brand">{health.components.profitability} / 25 pts</span>
             </div>
-            <div className="h-2 w-full rounded-full bg-sand overflow-hidden">
+            <div className="h-2 w-full rounded-full bg-canvas overflow-hidden">
               <div
-                className="h-full bg-leaf rounded-full transition-all duration-500"
+                className="h-full origin-left rounded-full bg-gradient-to-r from-accent to-brand motion-safe:animate-grow-x"
                 style={{ width: `${(health.components.profitability / 25) * 100}%` }}
               />
             </div>
@@ -111,11 +136,11 @@ export function HealthView({ business, metrics, health }: HealthViewProps) {
           <div className="space-y-1">
             <div className="flex justify-between text-xs">
               <span className="font-semibold text-ink">Cash Buffer & Runway</span>
-              <span className="font-bold text-forest">{health.components.cashBuffer} / 20 pts</span>
+              <span className="font-bold text-brand">{health.components.cashBuffer} / 20 pts</span>
             </div>
-            <div className="h-2 w-full rounded-full bg-sand overflow-hidden">
+            <div className="h-2 w-full rounded-full bg-canvas overflow-hidden">
               <div
-                className="h-full bg-leaf rounded-full transition-all duration-500"
+                className="h-full origin-left rounded-full bg-gradient-to-r from-accent to-brand motion-safe:animate-grow-x"
                 style={{ width: `${(health.components.cashBuffer / 20) * 100}%` }}
               />
             </div>
@@ -128,11 +153,11 @@ export function HealthView({ business, metrics, health }: HealthViewProps) {
           <div className="space-y-1">
             <div className="flex justify-between text-xs">
               <span className="font-semibold text-ink">Record Consistency</span>
-              <span className="font-bold text-forest">{health.components.recordConsistency} / 20 pts</span>
+              <span className="font-bold text-brand">{health.components.recordConsistency} / 20 pts</span>
             </div>
-            <div className="h-2 w-full rounded-full bg-sand overflow-hidden">
+            <div className="h-2 w-full rounded-full bg-canvas overflow-hidden">
               <div
-                className="h-full bg-leaf rounded-full transition-all duration-500"
+                className="h-full origin-left rounded-full bg-gradient-to-r from-accent to-brand motion-safe:animate-grow-x"
                 style={{ width: `${(health.components.recordConsistency / 20) * 100}%` }}
               />
             </div>
@@ -145,11 +170,11 @@ export function HealthView({ business, metrics, health }: HealthViewProps) {
           <div className="space-y-1">
             <div className="flex justify-between text-xs">
               <span className="font-semibold text-ink">Margin Stability</span>
-              <span className="font-bold text-forest">{health.components.marginStability} / 15 pts</span>
+              <span className="font-bold text-brand">{health.components.marginStability} / 15 pts</span>
             </div>
-            <div className="h-2 w-full rounded-full bg-sand overflow-hidden">
+            <div className="h-2 w-full rounded-full bg-canvas overflow-hidden">
               <div
-                className="h-full bg-leaf rounded-full transition-all duration-500"
+                className="h-full origin-left rounded-full bg-gradient-to-r from-accent to-brand motion-safe:animate-grow-x"
                 style={{ width: `${(health.components.marginStability / 15) * 100}%` }}
               />
             </div>
@@ -162,11 +187,11 @@ export function HealthView({ business, metrics, health }: HealthViewProps) {
           <div className="space-y-1">
             <div className="flex justify-between text-xs">
               <span className="font-semibold text-ink">Savings Discipline</span>
-              <span className="font-bold text-forest">{health.components.savingsDiscipline} / 10 pts</span>
+              <span className="font-bold text-brand">{health.components.savingsDiscipline} / 10 pts</span>
             </div>
-            <div className="h-2 w-full rounded-full bg-sand overflow-hidden">
+            <div className="h-2 w-full rounded-full bg-canvas overflow-hidden">
               <div
-                className="h-full bg-leaf rounded-full transition-all duration-500"
+                className="h-full origin-left rounded-full bg-gradient-to-r from-accent to-brand motion-safe:animate-grow-x"
                 style={{ width: `${(health.components.savingsDiscipline / 10) * 100}%` }}
               />
             </div>
@@ -179,11 +204,11 @@ export function HealthView({ business, metrics, health }: HealthViewProps) {
           <div className="space-y-1">
             <div className="flex justify-between text-xs">
               <span className="font-semibold text-ink">Compliance Progress</span>
-              <span className="font-bold text-forest">{health.components.complianceProgress} / 10 pts</span>
+              <span className="font-bold text-brand">{health.components.complianceProgress} / 10 pts</span>
             </div>
-            <div className="h-2 w-full rounded-full bg-sand overflow-hidden">
+            <div className="h-2 w-full rounded-full bg-canvas overflow-hidden">
               <div
-                className="h-full bg-leaf rounded-full transition-all duration-500"
+                className="h-full origin-left rounded-full bg-gradient-to-r from-accent to-brand motion-safe:animate-grow-x"
                 style={{ width: `${(health.components.complianceProgress / 10) * 100}%` }}
               />
             </div>
@@ -200,7 +225,7 @@ export function HealthView({ business, metrics, health }: HealthViewProps) {
         <ul className="space-y-2">
           {health.improvements.map((tip, idx) => (
             <li key={idx} className="flex items-start gap-2.5 text-xs text-ink">
-              <span className="text-leaf font-bold">✓</span>
+              <span className="text-brand font-bold">✓</span>
               <span>{tip}</span>
             </li>
           ))}

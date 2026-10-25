@@ -17,7 +17,7 @@ export default async function WizardPage() {
   return (
     <main className="space-y-4 pb-16">
       <div className="flex items-center justify-between pt-1">
-        <p className="text-xs font-bold uppercase tracking-wide text-leaf">GrowBox</p>
+        <p className="text-xs font-bold uppercase tracking-wide text-brand">GrowBox</p>
         <PersonaSwitcher currentStage={currentStage} />
       </div>
       <WizardForm />

@@ -19,14 +19,14 @@ export function LanguageSwitcher({ currentLanguage }: Readonly<LanguageSwitcherP
   };
 
   return (
-    <div className="inline-flex items-center rounded-lg border border-line bg-surface p-0.5 text-xs font-semibold">
+    <div className="inline-flex items-center rounded-lg border border-line bg-paper/70 p-0.5 text-xs font-semibold">
       <button
         type="button"
         disabled={isPending}
         onClick={() => handleToggle("en")}
         className={`rounded px-2 py-0.5 transition-colors ${
           currentLanguage === "en"
-            ? "bg-forest text-white"
+            ? "bg-brand text-white"
             : "text-muted hover:text-ink"
         }`}
       >
@@ -38,7 +38,7 @@ export function LanguageSwitcher({ currentLanguage }: Readonly<LanguageSwitcherP
         onClick={() => handleToggle("zu")}
         className={`rounded px-2 py-0.5 transition-colors ${
           currentLanguage === "zu"
-            ? "bg-forest text-white"
+            ? "bg-brand text-white"
             : "text-muted hover:text-ink"
         }`}
       >

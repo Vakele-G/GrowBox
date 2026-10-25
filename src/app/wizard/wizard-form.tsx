@@ -245,12 +245,37 @@ export function WizardForm() {
   return (
     <div className="space-y-6">
       {/* Stepper Header */}
-      <div className="flex items-center justify-between border-b border-line pb-3">
-        <div>
-          <p className="text-xs font-bold uppercase tracking-wider text-leaf">Stage 1: Idea</p>
-          <h1 className="text-xl font-bold text-ink">Launch & Costing Wizard</h1>
+      <div className="space-y-3 border-b border-line pb-3">
+        <div className="flex items-center justify-between">
+          <div>
+            <p className="text-xs font-bold uppercase tracking-wider text-brand">Stage 1: Idea</p>
+            <h1 className="text-xl font-bold text-ink">Launch & Costing Wizard</h1>
+          </div>
+          <span className="text-[11px] font-bold uppercase tracking-wide text-muted">
+            Step {step}/5
+          </span>
         </div>
-        <Pill tone="green">Step {step} of 5</Pill>
+        <div
+          className="flex gap-1.5"
+          role="progressbar"
+          aria-label="Wizard progress"
+          aria-valuenow={step}
+          aria-valuemin={1}
+          aria-valuemax={5}
+        >
+          {[1, 2, 3, 4, 5].map((n) => (
+            <span
+              key={n}
+              className={`h-1.5 flex-1 rounded-full ${
+                n < step
+                  ? "bg-gradient-to-r from-accent to-brand"
+                  : n === step
+                    ? "bg-accent"
+                    : "bg-sky/40"
+              }`}
+            />
+          ))}
+        </div>
       </div>
 
       {/* Step 1: Location & Target Market */}
@@ -351,66 +376,90 @@ export function WizardForm() {
           </p>
 
           <div className="space-y-3">
-            <label className="flex items-center gap-3 rounded-xl border border-line p-3 hover:bg-cream/40 cursor-pointer">
+            <label
+              className={`flex items-center gap-3 rounded-xl border p-3 transition-all cursor-pointer ${
+                ownedStove
+                  ? "border-accent bg-mist ring-1 ring-accent/40"
+                  : "border-line hover:bg-canvas/40"
+              }`}
+            >
               <input
                 type="checkbox"
                 checked={ownedStove}
                 onChange={(e) => setOwnedStove(e.target.checked)}
-                className="h-5 w-5 rounded accent-leaf"
+                className="h-5 w-5 rounded accent-accent"
               />
               <div className="flex-1">
                 <p className="text-sm font-semibold text-ink">Gas Stove / Burner</p>
                 <p className="text-xs text-muted">Estimated new: R650</p>
               </div>
-              <Pill tone={ownedStove ? "green" : "gray"}>
+              <Pill tone={ownedStove ? "brand" : "gray"}>
                 {ownedStove ? "Owned" : "Needed"}
               </Pill>
             </label>
 
-            <label className="flex items-center gap-3 rounded-xl border border-line p-3 hover:bg-cream/40 cursor-pointer">
+            <label
+              className={`flex items-center gap-3 rounded-xl border p-3 transition-all cursor-pointer ${
+                ownedPot
+                  ? "border-accent bg-mist ring-1 ring-accent/40"
+                  : "border-line hover:bg-canvas/40"
+              }`}
+            >
               <input
                 type="checkbox"
                 checked={ownedPot}
                 onChange={(e) => setOwnedPot(e.target.checked)}
-                className="h-5 w-5 rounded accent-leaf"
+                className="h-5 w-5 rounded accent-accent"
               />
               <div className="flex-1">
                 <p className="text-sm font-semibold text-ink">Large Deep Frying Pot</p>
                 <p className="text-xs text-muted">Estimated new: R180</p>
               </div>
-              <Pill tone={ownedPot ? "green" : "gray"}>
+              <Pill tone={ownedPot ? "brand" : "gray"}>
                 {ownedPot ? "Owned" : "Needed"}
               </Pill>
             </label>
 
-            <label className="flex items-center gap-3 rounded-xl border border-line p-3 hover:bg-cream/40 cursor-pointer">
+            <label
+              className={`flex items-center gap-3 rounded-xl border p-3 transition-all cursor-pointer ${
+                ownedCylinder
+                  ? "border-accent bg-mist ring-1 ring-accent/40"
+                  : "border-line hover:bg-canvas/40"
+              }`}
+            >
               <input
                 type="checkbox"
                 checked={ownedCylinder}
                 onChange={(e) => setOwnedCylinder(e.target.checked)}
-                className="h-5 w-5 rounded accent-leaf"
+                className="h-5 w-5 rounded accent-accent"
               />
               <div className="flex-1">
                 <p className="text-sm font-semibold text-ink">Gas Cylinder (9kg)</p>
                 <p className="text-xs text-muted">Estimated initial bottle & gas: R450</p>
               </div>
-              <Pill tone={ownedCylinder ? "green" : "gray"}>
+              <Pill tone={ownedCylinder ? "brand" : "gray"}>
                 {ownedCylinder ? "Owned" : "Needed"}
               </Pill>
             </label>
 
-            <label className="flex items-center gap-3 rounded-xl border border-line p-3 hover:bg-cream/40 cursor-pointer">
+            <label
+              className={`flex items-center gap-3 rounded-xl border p-3 transition-all cursor-pointer ${
+                ownedTable
+                  ? "border-accent bg-mist ring-1 ring-accent/40"
+                  : "border-line hover:bg-canvas/40"
+              }`}
+            >
               <input
                 type="checkbox"
                 checked={ownedTable}
                 onChange={(e) => setOwnedTable(e.target.checked)}
-                className="h-5 w-5 rounded accent-leaf"
+                className="h-5 w-5 rounded accent-accent"
               />
               <div className="flex-1">
                 <p className="text-sm font-semibold text-ink">Display Table & Cover</p>
                 <p className="text-xs text-muted">Estimated new: R200</p>
               </div>
-              <Pill tone={ownedTable ? "green" : "gray"}>
+              <Pill tone={ownedTable ? "brand" : "gray"}>
                 {ownedTable ? "Owned" : "Needed"}
               </Pill>
             </label>
@@ -470,15 +519,15 @@ export function WizardForm() {
 
             {/* Live Hero KPI Cards */}
             <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
-              <div className="rounded-xl bg-cream p-3 text-center">
+              <div className="rounded-xl bg-canvas p-3 text-center">
                 <p className="text-xs font-semibold text-muted uppercase">Unit Cost</p>
-                <p className="text-lg font-bold text-forest">
+                <p className="text-lg font-bold text-brand">
                   R{(costing.unitCostCents / 100).toFixed(2)}
                 </p>
                 <p className="text-[10px] text-muted">per gwinya</p>
               </div>
 
-              <div className="rounded-xl bg-cream p-3 text-center">
+              <div className="rounded-xl bg-canvas p-3 text-center">
                 <p className="text-xs font-semibold text-muted uppercase">Batch Cost</p>
                 <p className="text-lg font-bold text-ink">
                   R{(costing.batchCostCents / 100).toFixed(2)}
@@ -486,15 +535,15 @@ export function WizardForm() {
                 <p className="text-[10px] text-muted">for {batchYield} units</p>
               </div>
 
-              <div className="rounded-xl bg-cream p-3 text-center">
+              <div className="rounded-xl bg-canvas p-3 text-center">
                 <p className="text-xs font-semibold text-muted uppercase">Gross Margin</p>
-                <p className={`text-lg font-bold ${costing.grossMarginPct >= 50 ? "text-forest" : "text-amber"}`}>
+                <p className={`text-lg font-bold ${costing.grossMarginPct >= 50 ? "text-brand" : "text-amber-ink"}`}>
                   {costing.grossMarginPct.toFixed(1)}%
                 </p>
                 <p className="text-[10px] text-muted">profit share</p>
               </div>
 
-              <div className="rounded-xl bg-cream p-3 text-center">
+              <div className="rounded-xl bg-canvas p-3 text-center">
                 <p className="text-xs font-semibold text-muted uppercase">Break-Even</p>
                 <p className="text-lg font-bold text-ink">{breakEven}</p>
                 <p className="text-[10px] text-muted">units/day</p>
@@ -502,17 +551,17 @@ export function WizardForm() {
             </div>
 
             {/* Selling Price Adjustment */}
-            <div className="rounded-xl border border-line bg-mint/30 p-4 space-y-3">
+            <div className="rounded-xl border border-line bg-mist/30 p-4 space-y-3">
               <div className="flex items-center justify-between">
                 <div>
-                  <label className="label text-forest" htmlFor="sellingPrice">Your Selling Price</label>
+                  <label className="label text-brand" htmlFor="sellingPrice">Your Selling Price</label>
                   <p className="text-xs text-muted">
                     Market-friendly suggested price:{" "}
-                    <strong className="text-forest">R{(suggested / 100).toFixed(2)}</strong>
+                    <strong className="text-brand">R{(suggested / 100).toFixed(2)}</strong>
                   </p>
                 </div>
                 <div className="flex items-center gap-1">
-                  <span className="text-base font-bold text-forest">R</span>
+                  <span className="text-base font-bold text-brand">R</span>
                   <input
                     id="sellingPrice"
                     type="number"
@@ -579,15 +628,15 @@ export function WizardForm() {
       {/* Step 5: Practicality Check & Launch Plan */}
       {step === 5 && (
         <div className="space-y-4">
-          <Card className="p-5 space-y-4">
+          <Card className="card-lift p-5 space-y-4">
             <div className="flex items-center justify-between">
               <SectionTitle title="5. Practicality Check" />
-              <Pill tone={practicality.viable ? "green" : "red"}>
+              <Pill tone={practicality.viable ? "brand" : "red"}>
                 {practicality.viable ? "Viable to Launch" : "Budget Shortfall"}
               </Pill>
             </div>
 
-            <div className="rounded-xl border border-line bg-cream p-4 space-y-2">
+            <div className="rounded-xl border border-line bg-canvas p-4 space-y-2">
               <div className="flex justify-between text-sm">
                 <span className="text-muted">Your Startup Budget</span>
                 <span className="font-bold text-ink">R{budgetRands.toFixed(2)}</span>
@@ -605,8 +654,8 @@ export function WizardForm() {
                 </span>
               </div>
               <div className="border-t border-line pt-2 flex justify-between text-sm font-bold">
-                <span className="text-forest">Remaining Cash Buffer</span>
-                <span className={practicality.surplusCents >= 0 ? "text-forest" : "text-danger"}>
+                <span className="text-brand">Remaining Cash Buffer</span>
+                <span className={practicality.surplusCents >= 0 ? "text-brand" : "text-danger"}>
                   R{(practicality.surplusCents / 100).toFixed(2)}
                 </span>
               </div>
@@ -617,16 +666,16 @@ export function WizardForm() {
               <p className="label">GrowBox Mentor Feedback</p>
               {practicality.notes.map((note, index) => (
                 <div key={index} className="flex gap-2 text-xs text-ink/90">
-                  <span className="text-leaf font-bold">•</span>
+                  <span className="text-brand font-bold">•</span>
                   <span>{note}</span>
                 </div>
               ))}
             </div>
 
             {/* Projected Daily Profit */}
-            <div className="rounded-xl bg-mint/50 p-3">
-              <p className="text-xs font-semibold text-forest uppercase">Projected Daily Profit</p>
-              <p className="text-xl font-bold text-forest">
+            <div className="rounded-xl bg-mist/50 p-3">
+              <p className="text-xs font-semibold text-brand uppercase">Projected Daily Profit</p>
+              <p className="text-xl font-bold text-brand">
                 R{(projectedDailyProfit / 100).toFixed(2)} / day
               </p>
               <p className="text-[11px] text-muted">
@@ -643,7 +692,7 @@ export function WizardForm() {
                     key={index}
                     className="flex items-start gap-3 rounded-lg border border-line bg-paper p-3 text-xs"
                   >
-                    <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-mint text-[11px] font-bold text-forest">
+                    <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-mist text-[11px] font-bold text-brand">
                       {index + 1}
                     </span>
                     <span className="font-medium text-ink">{stepItem}</span>

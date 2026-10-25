@@ -1,4 +1,4 @@
-const CACHE_NAME = "growbox-v1";
+const CACHE_NAME = "growbox-v2";
 
 self.addEventListener("install", (event) => {
   event.waitUntil(

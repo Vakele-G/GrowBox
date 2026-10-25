@@ -2,6 +2,7 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 import type { Route } from "next";
 import { BottomNav } from "@/components/bottom-nav";
+import { HeroBand } from "@/components/hero-band";
 import { LanguageSwitcher } from "@/components/language-switcher";
 import { NextBestStepCard } from "@/components/next-best-step-card";
 import { NudgeInbox } from "@/components/nudge-inbox";
@@ -67,50 +68,52 @@ export default async function HomePage(props: {
   return (
     <div className="space-y-5 pb-6">
       {/* Header with App Identity, Stage, and Language Switcher */}
-      <header className="space-y-2">
-        <div className="flex items-center justify-between">
-          <p className="text-xs font-bold uppercase tracking-wide text-leaf">GrowBox</p>
-          <div className="flex items-center gap-2">
-            <PersonaSwitcher currentStage={currentStage} />
-            <LanguageSwitcher currentLanguage={language} />
-          </div>
-        </div>
-        <div>
-          <h1 className="text-2xl font-bold text-ink">{business.name}</h1>
-          <p className="text-xs text-muted">
-            {business.municipality} · Turning street hustle into a bankable business.
-          </p>
-        </div>
-      </header>
+      <div className="motion-safe:animate-rise">
+        <HeroBand
+          eyebrow="GrowBox"
+          title={business.name}
+          subtitle={`${business.municipality} · Turning street hustle into a bankable business.`}
+        />
+      </div>
+      <div className="-mt-2 flex items-center justify-end gap-2">
+        <PersonaSwitcher currentStage={currentStage} />
+        <LanguageSwitcher currentLanguage={language} />
+      </div>
 
       {/* Stage Transition Announcement (when criteria are met) */}
       {stageInfo.readyToAdvance && stageInfo.nextStage && (
-        <StageTransitionBanner
-          currentStage={stageInfo.currentStage}
-          nextStage={stageInfo.nextStage}
-          criteria={stageInfo.criteria}
-          language={language}
-        />
+        <div className="motion-safe:animate-rise" style={{ animationDelay: "60ms" }}>
+          <StageTransitionBanner
+            currentStage={stageInfo.currentStage}
+            nextStage={stageInfo.nextStage}
+            criteria={stageInfo.criteria}
+            language={language}
+          />
+        </div>
       )}
 
       {/* Hero: Next Best Step Card */}
-      <NextBestStepCard step={nextBestStep} />
+      <div className="motion-safe:animate-rise" style={{ animationDelay: "120ms" }}>
+        <NextBestStepCard step={nextBestStep} />
+      </div>
 
       {/* Proactive Nudges & Alerts Inbox */}
-      <NudgeInbox nudges={activeNudges} language={language} />
+      <div className="motion-safe:animate-rise" style={{ animationDelay: "180ms" }}>
+        <NudgeInbox nudges={activeNudges} language={language} />
+      </div>
 
       {/* Hero Feature Card: Stage 1 Wizard & Costing Calculator */}
-      <Card className="p-5 border-leaf/40 bg-mint/20 space-y-3">
+      <Card className="card-lift p-5 border-accent/40 bg-mist/20 space-y-3">
         <div className="flex items-start justify-between gap-2">
           <div>
-            <p className="text-xs font-bold uppercase tracking-wider text-forest">
+            <p className="text-xs font-bold uppercase tracking-wider text-brand">
               Stage 1 Feature
             </p>
             <h2 className="text-lg font-bold text-ink">
               Costing & Launch Planning Wizard
             </h2>
           </div>
-          <Pill tone="lime">Interactive</Pill>
+          <Pill tone="sky">Interactive</Pill>
         </div>
 
         <p className="text-xs text-muted leading-relaxed">
@@ -118,10 +121,10 @@ export default async function HomePage(props: {
         </p>
 
         {costing && (
-          <div className="grid grid-cols-3 gap-2 rounded-xl bg-paper p-3 text-center border border-line">
+          <div className="grid grid-cols-3 gap-2 rounded-xl bg-mist/60 p-3 text-center border border-sky/50">
             <div>
               <p className="text-[10px] text-muted uppercase font-semibold">Unit Cost</p>
-              <p className="text-sm font-bold text-forest">
+              <p className="text-sm font-bold text-brand">
                 R{((costing.costPerUnitCents ?? 202) / 100).toFixed(2)}
               </p>
             </div>
@@ -133,7 +136,7 @@ export default async function HomePage(props: {
             </div>
             <div>
               <p className="text-[10px] text-muted uppercase font-semibold">Gross Margin</p>
-              <p className="text-sm font-bold text-forest">
+              <p className="text-sm font-bold text-brand">
                 {(costing.marginPct ?? 59.6).toFixed(1)}%
               </p>
             </div>
@@ -155,7 +158,7 @@ export default async function HomePage(props: {
         <Card className="p-4 space-y-3">
           <SectionTitle
             title="Products & Menu"
-            action={<Pill tone="green">{products.length} active</Pill>}
+            action={<Pill tone="brand">{products.length} active</Pill>}
           />
           <div className="divide-y divide-line">
             {products.map((p) => (
@@ -166,7 +169,7 @@ export default async function HomePage(props: {
                     Batch yield: {p.batchYield} {p.unitLabel}s
                   </p>
                 </div>
-                <span className="font-bold text-forest">
+                <span className="font-bold text-brand">
                   R{(p.sellingPriceCents / 100).toFixed(2)}
                 </span>
               </div>
@@ -195,7 +198,7 @@ export default async function HomePage(props: {
                 <div className="flex items-center gap-2">
                   <span
                     className={`h-2 w-2 rounded-full ${
-                      item.status === "done" ? "bg-leaf" : "bg-amber"
+                      item.status === "done" ? "bg-accent" : "bg-amber"
                     }`}
                   />
                   <span className={item.status === "done" ? "line-through text-muted" : "font-medium text-ink"}>
@@ -225,11 +228,11 @@ export default async function HomePage(props: {
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 text-xs">
           <Link
             href={"/preview/launch" as Route}
-            className="rounded-lg border border-line p-2.5 bg-paper hover:bg-sand/30 space-y-1 block"
+            className="card-lift rounded-xl border border-line p-2.5 bg-paper hover:bg-mist space-y-1 block"
           >
             <div className="flex items-center justify-between">
               <span className="font-bold text-ink">Stage 2: Launch</span>
-              <Pill tone="lime">Preview</Pill>
+              <Pill tone="sky">Preview</Pill>
             </div>
             <p className="text-[10px] text-muted">
               Sourced municipal permit & food safety checklist.
@@ -238,11 +241,11 @@ export default async function HomePage(props: {
 
           <Link
             href={"/preview/grow" as Route}
-            className="rounded-lg border border-line p-2.5 bg-paper hover:bg-sand/30 space-y-1 block"
+            className="card-lift rounded-xl border border-line p-2.5 bg-paper hover:bg-mist space-y-1 block"
           >
             <div className="flex items-center justify-between">
               <span className="font-bold text-ink">Stage 4: Grow</span>
-              <Pill tone="green">Real Maths</Pill>
+              <Pill tone="brand">Real Maths</Pill>
             </div>
             <p className="text-[10px] text-muted">
               Second fryer affordability & payback mathematics.
@@ -251,7 +254,7 @@ export default async function HomePage(props: {
 
           <Link
             href={"/preview/enterprise" as Route}
-            className="rounded-lg border border-line p-2.5 bg-paper hover:bg-sand/30 space-y-1 block"
+            className="card-lift rounded-xl border border-line p-2.5 bg-paper hover:bg-mist space-y-1 block"
           >
             <div className="flex items-center justify-between">
               <span className="font-bold text-ink">Stage 5: Enterprise</span>

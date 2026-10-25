@@ -33,9 +33,9 @@ export function PersonaSwitcher({ currentStage }: PersonaSwitcherProps) {
       onClick={handleToggle}
       disabled={isPending}
       title={isStage1 ? "Switch to Stage 3 (Established with 14d trade history)" : "Reset to Stage 1 (Fresh startup idea with wizard)"}
-      className="inline-flex items-center gap-1.5 rounded-full border border-line bg-paper px-2.5 py-1 text-[11px] font-semibold text-ink shadow-2xs hover:bg-sand/40 disabled:opacity-50 transition-colors"
+      className="inline-flex items-center gap-1.5 rounded-full border border-line bg-paper px-2.5 py-1 text-[11px] font-semibold text-ink shadow-2xs hover:border-accent/50 hover:bg-mist disabled:opacity-50 transition-all active:scale-95"
     >
-      <span className={`h-1.5 w-1.5 rounded-full ${isStage1 ? "bg-amber" : "bg-leaf"}`} />
+      <span className={`h-1.5 w-1.5 rounded-full ${isStage1 ? "bg-amber" : "bg-accent"}`} />
       <span>
         {isPending
           ? "Switching..."

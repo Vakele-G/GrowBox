@@ -8,8 +8,8 @@ export default function manifest(): MetadataRoute.Manifest {
       "A proactive business mentor for South African informal entrepreneurs. Cost it, price it, log it, grow it.",
     start_url: "/",
     display: "standalone",
-    background_color: "#fbf8f0",
-    theme_color: "#0b5d3b",
+    background_color: "#e3f2fd",
+    theme_color: "#0d47a1",
     orientation: "portrait",
     icons: [
       {

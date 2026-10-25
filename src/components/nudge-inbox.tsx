@@ -30,7 +30,7 @@ export function NudgeInbox({ nudges, language }: Readonly<NudgeInboxProps>) {
         return <Pill tone="amber">Attention</Pill>;
       case "info":
       default:
-        return <Pill tone="green">Insight</Pill>;
+        return <Pill tone="brand">Insight</Pill>;
     }
   };
 
@@ -44,13 +44,16 @@ export function NudgeInbox({ nudges, language }: Readonly<NudgeInboxProps>) {
           activeNudges.length > 0 ? (
             <Pill tone="amber">{activeNudges.length} active</Pill>
           ) : (
-            <Pill tone="green">All clear</Pill>
+            <Pill tone="brand">All clear</Pill>
           )
         }
       />
 
       {activeNudges.length === 0 ? (
         <div className="rounded-xl border border-dashed border-line bg-paper/50 p-4 text-center">
+          <span className="mx-auto mb-2 flex h-10 w-10 items-center justify-center rounded-full bg-mist text-lg" aria-hidden>
+            ✅
+          </span>
           <p className="text-xs text-muted">
             {isZu
               ? "Konke kuhlelekile! Azikho izaziso ezintsha okwamanje."
@@ -66,7 +69,7 @@ export function NudgeInbox({ nudges, language }: Readonly<NudgeInboxProps>) {
                 ? "border-danger/30 bg-danger/5"
                 : nudge.severity === "warning"
                   ? "border-amber/30 bg-amber/5"
-                  : "border-leaf/30 bg-mint/10";
+                  : "border-accent/30 bg-mist/10";
 
             return (
               <div
@@ -91,7 +94,7 @@ export function NudgeInbox({ nudges, language }: Readonly<NudgeInboxProps>) {
                     type="button"
                     disabled={isPending}
                     onClick={() => handleUpdateStatus(nudge.id, "dismissed")}
-                    className="rounded-lg px-2.5 py-1 text-xs text-muted hover:text-ink hover:bg-black/5 font-semibold transition-colors"
+                    className="rounded-lg px-2.5 py-1 text-xs text-muted hover:text-ink hover:bg-mist font-semibold transition-colors"
                   >
                     {isZu ? "Susa" : "Dismiss"}
                   </button>
@@ -99,7 +102,7 @@ export function NudgeInbox({ nudges, language }: Readonly<NudgeInboxProps>) {
                     type="button"
                     disabled={isPending}
                     onClick={() => handleUpdateStatus(nudge.id, "done")}
-                    className="rounded-lg bg-forest text-white px-3 py-1 text-xs font-bold hover:bg-forest/90 transition-colors shadow-sm"
+                    className="rounded-lg bg-brand text-white px-3 py-1 text-xs font-bold hover:bg-brand/90 transition-all shadow-sm active:scale-95"
                   >
                     {isZu ? "Kwenziwe ✓" : "Mark Done ✓"}
                   </button>

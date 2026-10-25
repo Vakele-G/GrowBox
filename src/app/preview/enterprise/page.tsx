@@ -1,6 +1,7 @@
 import Link from "next/link";
 import type { Route } from "next";
 import { BottomNav } from "@/components/bottom-nav";
+import { HeroBand } from "@/components/hero-band";
 import { Card, Pill, SectionTitle } from "@/components/ui";
 
 export const metadata = {
@@ -14,29 +15,27 @@ export default function EnterprisePreviewPage() {
       <div className="flex items-center justify-between">
         <Link
           href={"/" as Route}
-          className="text-xs font-bold text-forest hover:underline flex items-center gap-1"
+          className="text-xs font-bold text-brand hover:underline flex items-center gap-1"
         >
           ← Back to Home
         </Link>
         <Pill tone="amber">Stage 5 Preview</Pill>
       </div>
 
-      <header className="space-y-1">
-        <div className="flex items-center gap-2">
-          <Pill tone="amber">Preview - pitch only</Pill>
-          <span className="text-xs text-muted">The End State</span>
-        </div>
-        <h1 className="text-2xl font-bold text-ink">Stage 5: Enterprise & Expansion</h1>
-        <p className="text-xs text-muted">
-          From a street-side amagwinya stall to an established, formalised, multi-outlet township food brand.
-        </p>
-      </header>
+      <div className="motion-safe:animate-rise">
+        <HeroBand
+          eyebrow="GrowBox Stage Preview"
+          title="Stage 5: Enterprise & Expansion"
+          subtitle="The end state — from a street-side amagwinya stall to an established, formalised, multi-outlet township food brand."
+          action={<Pill tone="amber">Preview - pitch only</Pill>}
+        />
+      </div>
 
       {/* Hero Vision Card */}
-      <Card className="p-5 border-leaf/40 bg-gradient-to-b from-mint/20 to-paper space-y-3">
+      <Card className="card-lift p-5 border-sky/50 bg-gradient-to-b from-mist/40 to-paper space-y-3">
         <div className="flex items-center justify-between">
-          <p className="text-xs font-bold uppercase tracking-wider text-forest">The GrowBox Promise</p>
-          <Pill tone="green">Bankable & Growing</Pill>
+          <p className="text-xs font-bold uppercase tracking-wider text-brand">The GrowBox Promise</p>
+          <Pill tone="brand">Bankable & Growing</Pill>
         </div>
         <h2 className="text-lg font-bold text-ink">
           &ldquo;We turn a street hustle into a bankable business by building the financial track record banks need.&rdquo;
@@ -52,7 +51,7 @@ export default function EnterprisePreviewPage() {
         <Card className="p-4 space-y-2">
           <div className="flex items-center justify-between">
             <SectionTitle title="1. Legal & Regulatory Formalisation" />
-            <Pill tone="lime">CIPC & SARS</Pill>
+            <Pill tone="sky">CIPC & SARS</Pill>
           </div>
           <p className="text-xs text-muted leading-relaxed">
             Registered (Pty) Ltd company structure, SARS Tax Clearance PIN, and municipal food premises certificates, prepared directly from the business&apos;s verified paper trail.
@@ -63,7 +62,7 @@ export default function EnterprisePreviewPage() {
         <Card className="p-4 space-y-2">
           <div className="flex items-center justify-between">
             <SectionTitle title="2. Multi-Outlet Rollout & Job Creation" />
-            <Pill tone="lime">Employment</Pill>
+            <Pill tone="sky">Employment</Pill>
           </div>
           <p className="text-xs text-muted leading-relaxed">
             Expanding from Nomsa&apos;s original stall to 3 branded township hubs (Orlando East, Bara Taxi Rank, and Meadowlands). Employment contracts, UIF registration, and standardized recipe manuals.
@@ -74,7 +73,7 @@ export default function EnterprisePreviewPage() {
         <Card className="p-4 space-y-2">
           <div className="flex items-center justify-between">
             <SectionTitle title="3. Wholesale Supply Terms" />
-            <Pill tone="lime">Procurement</Pill>
+            <Pill tone="sky">Procurement</Pill>
           </div>
           <p className="text-xs text-muted leading-relaxed">
             Transitioning from retail grocery packs to pallet-tier pricing directly from millers and oil refineries (e.g. 200kg flour sacks and 200L oil drums), improving gross margins by an additional 12–15%.
@@ -82,10 +81,10 @@ export default function EnterprisePreviewPage() {
         </Card>
 
         {/* 4. FNB Commercial SME Facilities */}
-        <Card className="p-4 space-y-2 bg-paper border-forest/30">
+        <Card className="p-4 space-y-2 bg-paper border-brand/30">
           <div className="flex items-center justify-between">
             <SectionTitle title="4. FNB Commercial SME Relationship" />
-            <Pill tone="green">FNB Integration</Pill>
+            <Pill tone="brand">FNB Integration</Pill>
           </div>
           <p className="text-xs text-muted leading-relaxed">
             Graduation to an FNB Gold Business Account with Speedpoint fleet, automated eWallet payroll for staff, and asset-backed vehicle finance for mobile food distribution.

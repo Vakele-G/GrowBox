@@ -47,25 +47,35 @@ export function LoginForm({ lang = "en" }: Readonly<{ lang?: Language }>) {
   }
 
   return (
-    <main className="flex min-h-dvh flex-col justify-center gap-4 px-6">
-      <div className="text-center">
-        <p className="text-xs font-bold uppercase tracking-wide text-leaf">GrowBox</p>
-        <h1 className="mt-1 text-2xl font-bold text-ink">{messages.auth.title}</h1>
-        <p className="mt-2 text-sm text-muted">{messages.auth.subtitle}</p>
+    <main className="hero-band -mx-4 -mt-4 flex min-h-dvh flex-col justify-center gap-5 rounded-none px-6">
+      <div className="relative z-10 text-center">
+        <span
+          className="mx-auto mb-3 flex h-14 w-14 items-center justify-center rounded-2xl bg-white/15 text-2xl ring-1 ring-white/25"
+          aria-hidden
+        >
+          📦
+        </span>
+        <p className="text-[11px] font-extrabold uppercase tracking-[0.18em] text-white">
+          GrowBox
+        </p>
+        <h1 className="mt-2 text-2xl font-extrabold text-white">{messages.auth.title}</h1>
+        <p className="mt-2 text-sm text-white">{messages.auth.subtitle}</p>
       </div>
 
-      <button
-        type="button"
-        onClick={handleDemoSignIn}
-        disabled={busy}
-        className="btn-primary min-h-[44px] w-full rounded-xl px-4 font-semibold text-white disabled:opacity-55"
-      >
-        {busy ? messages.common.signingIn : messages.auth.demoButton}
-      </button>
+      <div className="relative z-10 space-y-3">
+        <button
+          type="button"
+          onClick={handleDemoSignIn}
+          disabled={busy}
+          className="w-full rounded-xl bg-white px-4 py-3 font-bold text-brand shadow-float transition-transform active:scale-[0.98] disabled:opacity-60"
+        >
+          {busy ? messages.common.signingIn : messages.auth.demoButton}
+        </button>
 
-      {error ? <p className="text-sm text-danger">{error}</p> : null}
+        {error ? <p className="text-sm font-semibold text-white">⚠ {error}</p> : null}
 
-      <p className="text-center text-xs text-muted">{messages.auth.demoHint}</p>
+        <p className="text-center text-xs text-white">{messages.auth.demoHint}</p>
+      </div>
     </main>
   );
 }

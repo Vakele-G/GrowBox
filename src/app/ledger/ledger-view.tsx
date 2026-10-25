@@ -2,6 +2,7 @@
 
 import { useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
+import { HeroBand } from "@/components/hero-band";
 import { Card, Pill, SectionTitle } from "@/components/ui";
 import { formatDateZA } from "@/lib/domain/dates";
 import type { DailyTotal, Transaction } from "@/lib/domain/types";
@@ -72,19 +73,19 @@ export function LedgerView({
 
   return (
     <div className="space-y-5">
-      <header>
-        <p className="text-xs font-bold uppercase tracking-wide text-leaf">Financial Records</p>
-        <h1 className="mt-1 text-2xl font-bold text-ink">Trading Ledger</h1>
-        <p className="mt-1 text-sm text-muted">
-          Your complete paper trail of sales, expenses, and daily cash summaries.
-        </p>
-      </header>
+      <div className="motion-safe:animate-rise">
+        <HeroBand
+          eyebrow="Financial Records"
+          title="Trading Ledger"
+          subtitle="Your complete paper trail of sales, expenses, and daily cash summaries."
+        />
+      </div>
 
       {/* KPI Summary Cards */}
       <div className="grid grid-cols-3 gap-2 text-center">
         <Card className="p-3">
           <p className="text-[10px] uppercase font-bold text-muted">Total Sales</p>
-          <p className="mt-1 text-base font-bold text-forest">
+          <p className="mt-1 text-base font-bold text-brand">
             R{(totalSalesCents / 100).toFixed(0)}
           </p>
         </Card>
@@ -98,7 +99,7 @@ export function LedgerView({
           <p className="text-[10px] uppercase font-bold text-muted">Net Profit</p>
           <p
             className={`mt-1 text-base font-bold ${
-              netProfitCents >= 0 ? "text-forest" : "text-danger"
+              netProfitCents >= 0 ? "text-brand" : "text-danger"
             }`}
           >
             R{(netProfitCents / 100).toFixed(0)}
@@ -136,7 +137,13 @@ export function LedgerView({
       {/* Transactions Grouped by Day */}
       <div className="space-y-4">
         {groupedByDate.length === 0 ? (
-          <Card className="p-6 text-center text-sm text-muted">
+          <Card className="border-dashed p-6 text-center text-sm text-muted">
+            <span
+              className="mx-auto mb-2 flex h-12 w-12 items-center justify-center rounded-full bg-mist text-xl"
+              aria-hidden
+            >
+              🧾
+            </span>
             No transactions found for the selected filter.
           </Card>
         ) : (
@@ -151,14 +158,14 @@ export function LedgerView({
             const dayProfit = daySales - dayExpenses;
 
             return (
-              <Card key={date} className="p-4 space-y-3">
+              <Card key={date} className="motion-safe:animate-rise p-4 space-y-3">
                 <div className="flex items-center justify-between border-b border-line pb-2">
                   <div>
-                    <h3 className="text-sm font-bold text-ink">{formatDateZA(date)}</h3>
+                    <h3 className="text-sm font-bold text-brand">{formatDateZA(date)}</h3>
                     <p className="text-[11px] text-muted">{txs.length} entries</p>
                   </div>
                   <div className="text-right text-xs">
-                    <span className="font-bold text-forest">
+                    <span className="font-bold text-brand">
                       +R{(daySales / 100).toFixed(0)}
                     </span>{" "}
                     /{" "}
@@ -167,7 +174,7 @@ export function LedgerView({
                     </span>
                     <p
                       className={`text-[10px] font-semibold ${
-                        dayProfit >= 0 ? "text-forest" : "text-danger"
+                        dayProfit >= 0 ? "text-brand" : "text-danger"
                       }`}
                     >
                       Day net: R{(dayProfit / 100).toFixed(0)}
@@ -187,7 +194,7 @@ export function LedgerView({
                           <Pill
                             tone={
                               tx.source === "fnb"
-                                ? "lime"
+                                ? "sky"
                                 : tx.source === "text"
                                   ? "amber"
                                   : "gray"
@@ -208,7 +215,7 @@ export function LedgerView({
                       <div className="flex items-center gap-3 shrink-0">
                         <span
                           className={`font-bold text-sm ${
-                            tx.type === "sale" ? "text-forest" : "text-danger"
+                            tx.type === "sale" ? "text-brand" : "text-danger"
                           }`}
                         >
                           {tx.type === "sale" ? "+" : "-"}R

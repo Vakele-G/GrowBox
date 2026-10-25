@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { HeroBand } from "@/components/hero-band";
 import { Card, Pill, SectionTitle } from "@/components/ui";
 import { formatDateZA } from "@/lib/domain/dates";
 import type { WarningTrigger } from "@/lib/domain/metrics";
@@ -39,16 +40,14 @@ export function DashboardView({
 
   return (
     <div className="space-y-5">
-      <header>
-        <div className="flex items-center justify-between">
-          <p className="text-xs font-bold uppercase tracking-wide text-leaf">Stage 3: Stable</p>
-          <Pill tone="green">Healthy Growth</Pill>
-        </div>
-        <h1 className="mt-1 text-2xl font-bold text-ink">{businessName}</h1>
-        <p className="mt-1 text-sm text-muted">
-          Financial dashboard, cash runway forecast, and proactive early warnings.
-        </p>
-      </header>
+      <div className="motion-safe:animate-rise">
+        <HeroBand
+          eyebrow="Stage 3: Stable"
+          title={businessName}
+          subtitle="Financial dashboard, cash runway forecast, and proactive early warnings."
+          action={<Pill tone="brand">Healthy Growth</Pill>}
+        />
+      </div>
 
       {/* Active Warnings & Proactive Alerts */}
       {warnings.length > 0 && (
@@ -56,12 +55,12 @@ export function DashboardView({
           {warnings.map((w) => (
             <div
               key={w.key}
-              className={`rounded-2xl border p-4 space-y-1.5 ${
+              className={`rounded-2xl border border-l-4 p-4 space-y-1.5 ${
                 w.severity === "critical"
-                  ? "border-danger/30 bg-danger-soft/60"
+                  ? "border-danger/30 border-l-danger bg-danger-soft/60 motion-safe:animate-pop"
                   : w.severity === "warning"
-                    ? "border-amber/30 bg-amber-soft/60"
-                    : "border-leaf/30 bg-mint/50"
+                    ? "border-amber/30 border-l-amber bg-amber-soft/60"
+                    : "border-accent/30 border-l-accent bg-mist/50"
               }`}
             >
               <div className="flex items-center justify-between">
@@ -70,13 +69,13 @@ export function DashboardView({
                     w.severity === "critical"
                       ? "text-danger"
                       : w.severity === "warning"
-                        ? "text-amber"
-                        : "text-forest"
+                        ? "text-amber-ink"
+                        : "text-brand"
                   }`}
                 >
                   {w.title}
                 </span>
-                <Pill tone={w.severity === "critical" ? "red" : w.severity === "warning" ? "amber" : "green"}>
+                <Pill tone={w.severity === "critical" ? "red" : w.severity === "warning" ? "amber" : "brand"}>
                   {w.severity.toUpperCase()}
                 </Pill>
               </div>
@@ -95,19 +94,29 @@ export function DashboardView({
 
       {/* KPI 4-Card Grid */}
       <div className="grid grid-cols-2 gap-2.5">
-        <Card className="p-3.5 space-y-1">
-          <p className="text-[10px] font-bold text-muted uppercase">Cash on Hand</p>
-          <p className="text-xl font-bold text-forest">
+        <Card className="card-lift p-3.5 space-y-1">
+          <div className="flex items-center justify-between">
+            <p className="text-[10px] font-bold text-muted uppercase">Cash on Hand</p>
+            <span className="flex h-7 w-7 items-center justify-center rounded-lg bg-mist text-sm" aria-hidden>
+              💰
+            </span>
+          </div>
+          <p className="text-xl font-bold text-brand">
             R{(metrics.cashOnHandCents / 100).toFixed(0)}
           </p>
           <p className="text-[10px] text-muted">Net after stock & owner draws</p>
         </Card>
 
-        <Card className="p-3.5 space-y-1">
-          <p className="text-[10px] font-bold text-muted uppercase">Cash Runway</p>
+        <Card className="card-lift p-3.5 space-y-1">
+          <div className="flex items-center justify-between">
+            <p className="text-[10px] font-bold text-muted uppercase">Cash Runway</p>
+            <span className="flex h-7 w-7 items-center justify-center rounded-lg bg-mist text-sm" aria-hidden>
+              ⏳
+            </span>
+          </div>
           <p
             className={`text-xl font-bold ${
-              (metrics.cashRunwayDays ?? 0) <= 3 ? "text-amber" : "text-forest"
+              (metrics.cashRunwayDays ?? 0) <= 3 ? "text-amber-ink" : "text-brand"
             }`}
           >
             {metrics.cashRunwayDays !== null ? `${metrics.cashRunwayDays} days` : "N/A"}
@@ -117,11 +126,16 @@ export function DashboardView({
           </p>
         </Card>
 
-        <Card className="p-3.5 space-y-1">
-          <p className="text-[10px] font-bold text-muted uppercase">4-Week Margin</p>
+        <Card className="card-lift p-3.5 space-y-1">
+          <div className="flex items-center justify-between">
+            <p className="text-[10px] font-bold text-muted uppercase">4-Week Margin</p>
+            <span className="flex h-7 w-7 items-center justify-center rounded-lg bg-mist text-sm" aria-hidden>
+              📈
+            </span>
+          </div>
           <p
             className={`text-xl font-bold ${
-              metrics.fourWeekMarginPct >= 50 ? "text-forest" : "text-amber"
+              metrics.fourWeekMarginPct >= 50 ? "text-brand" : "text-amber-ink"
             }`}
           >
             {metrics.fourWeekMarginPct.toFixed(1)}%
@@ -131,11 +145,16 @@ export function DashboardView({
           </p>
         </Card>
 
-        <Card className="p-3.5 space-y-1">
-          <p className="text-[10px] font-bold text-muted uppercase">Savings Buffer</p>
+        <Card className="card-lift p-3.5 space-y-1">
+          <div className="flex items-center justify-between">
+            <p className="text-[10px] font-bold text-muted uppercase">Savings Buffer</p>
+            <span className="flex h-7 w-7 items-center justify-center rounded-lg bg-mist text-sm" aria-hidden>
+              🛟
+            </span>
+          </div>
           <p
             className={`text-xl font-bold ${
-              metrics.savingsBufferWeeks >= 1 ? "text-forest" : "text-amber"
+              metrics.savingsBufferWeeks >= 1 ? "text-brand" : "text-amber-ink"
             }`}
           >
             {metrics.savingsBufferWeeks}x weeks
@@ -148,12 +167,12 @@ export function DashboardView({
       <Card className="p-4 space-y-3">
         <div className="flex items-center justify-between">
           <SectionTitle title="Sales & Cash Flow Trend" />
-          <div className="flex rounded-lg border border-line bg-cream p-0.5 text-xs font-semibold">
+          <div className="flex rounded-lg border border-line bg-canvas p-0.5 text-xs font-semibold">
             <button
               type="button"
               onClick={() => setTrendDays(14)}
-              className={`rounded px-2 py-0.5 ${
-                trendDays === 14 ? "bg-forest text-white" : "text-muted"
+              className={`rounded px-2 py-0.5 transition-colors ${
+                trendDays === 14 ? "bg-brand text-white shadow-btn" : "text-muted"
               }`}
             >
               14 Days
@@ -161,8 +180,8 @@ export function DashboardView({
             <button
               type="button"
               onClick={() => setTrendDays(30)}
-              className={`rounded px-2 py-0.5 ${
-                trendDays === 30 ? "bg-forest text-white" : "text-muted"
+              className={`rounded px-2 py-0.5 transition-colors ${
+                trendDays === 30 ? "bg-brand text-white shadow-btn" : "text-muted"
               }`}
             >
               30 Days
@@ -185,18 +204,18 @@ export function DashboardView({
                 <div className="flex justify-between text-[11px] text-muted">
                   <span className="font-semibold text-ink">{formatDateZA(day.date)}</span>
                   <span>
-                    <strong className="text-forest">+R{(day.salesCents / 100).toFixed(0)}</strong> /{" "}
+                    <strong className="text-brand">+R{(day.salesCents / 100).toFixed(0)}</strong> /{" "}
                     <strong className="text-danger">-R{(day.expensesCents / 100).toFixed(0)}</strong>
                   </span>
                 </div>
-                <div className="h-2 w-full rounded-full bg-cream overflow-hidden flex gap-0.5">
+                <div className="h-2 w-full rounded-full bg-canvas overflow-hidden flex gap-0.5">
                   <div
-                    className="h-full rounded-full bg-leaf"
+                    className="h-full origin-left rounded-full bg-gradient-to-r from-accent to-sky motion-safe:animate-grow-x"
                     style={{ width: `${salesWidth}%` }}
                     title={`Sales: R${(day.salesCents / 100).toFixed(0)}`}
                   />
                   <div
-                    className="h-full rounded-full bg-danger/80"
+                    className="h-full origin-left rounded-full bg-danger/80 motion-safe:animate-grow-x"
                     style={{ width: `${expWidth}%` }}
                     title={`Expenses: R${(day.expensesCents / 100).toFixed(0)}`}
                   />
@@ -211,7 +230,7 @@ export function DashboardView({
       <Card className="p-4 space-y-2">
         <div className="flex items-center justify-between">
           <SectionTitle title="Stock & Ingredients Guidance" />
-          <Pill tone={(metrics.stockDaysCover ?? 0) >= 2 ? "green" : "amber"}>
+          <Pill tone={(metrics.stockDaysCover ?? 0) >= 2 ? "brand" : "amber"}>
             {metrics.stockDaysCover ?? 0} days cover
           </Pill>
         </div>
@@ -219,20 +238,20 @@ export function DashboardView({
           Based on current daily sales volume, your stock covers about{" "}
           <strong className="text-ink">{metrics.stockDaysCover ?? 0} days of trade</strong>.
           Next regular restock estimated cost:{" "}
-          <strong className="text-forest">R{(metrics.nextRestockCostCents / 100).toFixed(0)}</strong>.
+          <strong className="text-brand">R{(metrics.nextRestockCostCents / 100).toFixed(0)}</strong>.
         </p>
       </Card>
 
       {/* Personal vs Business Money Separation Prompt */}
-      <Card className="p-4 border-leaf/30 bg-mint/20 space-y-3">
+      <Card className="p-4 border-sky/50 bg-mist/40 space-y-3">
         <div className="flex items-start justify-between">
           <div>
-            <p className="text-xs font-bold uppercase text-forest">Financial Discipline</p>
+            <p className="text-xs font-bold uppercase text-brand">Financial Discipline</p>
             <h3 className="text-sm font-bold text-ink">
               Separating Business & Personal Cash
             </h3>
           </div>
-          <Pill tone={separatedMoney ? "green" : "amber"}>
+          <Pill tone={separatedMoney ? "brand" : "amber"}>
             {separatedMoney ? "Separated" : "Mixed Funds"}
           </Pill>
         </div>
@@ -242,7 +261,7 @@ export function DashboardView({
         </p>
 
         {separatedMessage && (
-          <p className="text-xs font-semibold text-forest bg-paper p-2 rounded-lg border border-line">
+          <p className="text-xs font-semibold text-brand bg-paper p-2 rounded-lg border border-line">
             {separatedMessage}
           </p>
         )}

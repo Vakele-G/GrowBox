@@ -33,49 +33,61 @@ function chunk(type, data) {
   return Buffer.concat([length, typeBuffer, data, crc]);
 }
 
+// Brand palette — ColorHunt E3F2FD / 90CAF9 / 2196F3 / 0D47A1
+const brand = [13, 71, 161]; // #0D47A1 background
+const brandDeep = [10, 54, 121]; // #0A3679 box inset
+const sky = [144, 202, 249]; // #90CAF9 leaves
+const accent = [33, 150, 243]; // #2196F3 leaf highlights
+const white = [255, 255, 255];
+
+/**
+ * Draws on a 64x64 design grid. `draw` receives unit-aware helpers so the
+ * same artwork scales cleanly to every icon size.
+ */
 function writePng(filePath, size, draw) {
   const pixels = new Uint8Array(size * size * 4);
+  for (let i = 0; i < pixels.length; i += 4) {
+    pixels[i] = brand[0];
+    pixels[i + 1] = brand[1];
+    pixels[i + 2] = brand[2];
+    pixels[i + 3] = 255;
+  }
+
+  const scale = size / 64;
+
   const setPixel = (x, y, color) => {
+    if (x < 0 || y < 0 || x >= size || y >= size) return;
     const index = (y * size + x) * 4;
     pixels[index] = color[0];
     pixels[index + 1] = color[1];
     pixels[index + 2] = color[2];
     pixels[index + 3] = 255;
   };
-  const at = (x, y) => Math.floor(((y + 0.5) / size) * 64);
-  const atR = (x, y, radius) => {
-    const cx = at(x);
-    const cy = at(y);
-    const r = radius * size;
-    const rr = Math.ceil(r);
-    for (let py = -rr; py <= rr; py += 1) {
-      for (let px = -rr; px <= rr; px += 1) {
-        if (px * px + py * py <= r * r) {
-          const pxAbs = Math.round(cx) + px;
-          const pyAbs = Math.round(cy) + py;
-          if (pxAbs >= 0 && pxAbs < size && pyAbs >= 0 && pyAbs < size) {
-            setPixel(pxAbs, pyAbs, draw);
-          }
-        }
-      }
-    }
-  };
+
   const fillRect = (x0, y0, w, h, color) => {
-    for (let y = 0; y < h; y += 1) {
-      for (let x = 0; x < w; x += 1) setPixel(Math.floor(x0 * size) + x, Math.floor(y0 * size) + y, color);
+    const left = Math.round(x0 * scale);
+    const top = Math.round(y0 * scale);
+    const right = Math.round((x0 + w) * scale);
+    const bottom = Math.round((y0 + h) * scale);
+    for (let y = top; y < bottom; y += 1) {
+      for (let x = left; x < right; x += 1) setPixel(x, y, color);
     }
   };
 
-  for (let y = 0; y < size; y += 1) {
-    for (let x = 0; x < size; x += 1) {
-      const index = (y * size + x) * 4;
-      pixels[index] = 11;
-      pixels[index + 1] = 93;
-      pixels[index + 2] = 59;
-      pixels[index + 3] = 255;
+  const circle = (cx, cy, radius, color) => {
+    const px = cx * scale;
+    const py = cy * scale;
+    const r = radius * scale;
+    for (let y = Math.floor(py - r); y <= Math.ceil(py + r); y += 1) {
+      for (let x = Math.floor(px - r); x <= Math.ceil(px + r); x += 1) {
+        const dx = x + 0.5 - px;
+        const dy = y + 0.5 - py;
+        if (dx * dx + dy * dy <= r * r) setPixel(x, y, color);
+      }
     }
-  }
-  draw(size, setPixel, at, atR, fillRect);
+  };
+
+  draw({ fillRect, circle });
 
   const raw = Buffer.alloc((size * 4 + 1) * size);
   for (let y = 0; y < size; y += 1) {
@@ -99,32 +111,35 @@ function writePng(filePath, size, draw) {
   ihdr[11] = 0;
   ihdr[12] = 0;
   const idat = zlib.deflateSync(raw, { level: 9 });
-  const ihdrChunk = chunk("IHDR", ihdr);
-  const idatChunk = chunk("IDAT", idat);
-  const iendChunk = chunk("IEND", Buffer.alloc(0));
   const out = Buffer.concat([
     Buffer.from([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a]),
-    ihdrChunk,
-    idatChunk,
-    iendChunk,
+    chunk("IHDR", ihdr),
+    chunk("IDAT", idat),
+    chunk("IEND", Buffer.alloc(0)),
   ]);
   fs.writeFileSync(filePath, out);
 }
 
-const greenDark = [7, 59, 40];
-const lime = [182, 217, 76];
-const leaf = [20, 128, 92];
-const cream = [251, 248, 240];
+/** Plant-in-a-box mark. `scale` shrinks artwork toward the centre (maskable). */
+function drawMark({ fillRect, circle }, scale = 1) {
+  const c = 32;
+  const t = (v) => c + (v - c) * scale;
+  const r = (v) => v * scale;
 
-for (const size of [192, 512]) {
-  writePng(path.join(outDir, `icon-${size}.png`), size, (sz, setPixel, at, atR, fillRect) => {
-    fillRect(4, 30, 56, 6, cream);
-    atR(32, 18, 10, lime);
-    atR(21, 10, 6, leaf);
-    atR(43, 10, 6, leaf);
-    atR(32, 14, 4, leaf);
-    atR(27, 6, 3, leaf);
-    atR(37, 6, 3, leaf);
-    fillRect(18, 36, 28, 20, greenDark);
-  });
+  // Soil line
+  fillRect(t(4), t(30), 56 * scale, 6 * scale, white);
+  // Leaves
+  circle(t(32), t(18), r(10), sky);
+  circle(t(21), t(10), r(6), sky);
+  circle(t(43), t(10), r(6), sky);
+  circle(t(32), t(14), r(4), accent);
+  circle(t(27), t(6), r(3), accent);
+  circle(t(37), t(6), r(3), accent);
+  // Open box
+  fillRect(t(18), t(36), 28 * scale, 20 * scale, white);
+  fillRect(t(21), t(39), 22 * scale, 14 * scale, brandDeep);
 }
+
+writePng(path.join(outDir, "icon-192.png"), 192, (d) => drawMark(d, 1));
+writePng(path.join(outDir, "icon-512.png"), 512, (d) => drawMark(d, 1));
+writePng(path.join(outDir, "icon-maskable-512.png"), 512, (d) => drawMark(d, 0.7));

@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { HeroBand } from "@/components/hero-band";
 import { Card, Pill, SectionTitle } from "@/components/ui";
 import type { ParsedEntry, TransactionType } from "@/lib/domain/types";
 import { confirmAndSaveTransactions, parseLogAction } from "./actions";
@@ -108,21 +109,21 @@ export function LogForm() {
 
   return (
     <div className="space-y-5">
-      <header>
-        <p className="text-xs font-bold uppercase tracking-wide text-leaf">GrowBox Logging</p>
-        <h1 className="mt-1 text-2xl font-bold text-ink">Log Trading Day</h1>
-        <p className="mt-1 text-sm text-muted">
-          Type naturally in plain language or use the quick manual form.
-        </p>
-      </header>
+      <div className="motion-safe:animate-rise">
+        <HeroBand
+          eyebrow="GrowBox Logging"
+          title="Log Trading Day"
+          subtitle="Type naturally in plain language or use the quick manual form."
+        />
+      </div>
 
       {/* Tabs */}
-      <div className="flex rounded-xl bg-paper p-1 border border-line">
+      <div className="flex rounded-xl bg-mist p-1 border border-sky/50">
         <button
           type="button"
           onClick={() => setTab("text")}
           className={`flex-1 min-h-[40px] rounded-lg text-xs font-bold transition-colors ${
-            tab === "text" ? "bg-forest text-white" : "text-muted hover:text-ink"
+            tab === "text" ? "bg-brand text-white shadow-btn" : "text-muted hover:text-ink"
           }`}
         >
           Quick Natural Language
@@ -131,7 +132,7 @@ export function LogForm() {
           type="button"
           onClick={() => setTab("manual")}
           className={`flex-1 min-h-[40px] rounded-lg text-xs font-bold transition-colors ${
-            tab === "manual" ? "bg-forest text-white" : "text-muted hover:text-ink"
+            tab === "manual" ? "bg-brand text-white shadow-btn" : "text-muted hover:text-ink"
           }`}
         >
           Manual Entry Form
@@ -139,7 +140,7 @@ export function LogForm() {
       </div>
 
       {successMessage && (
-        <div className="rounded-xl bg-mint p-3 text-center text-sm font-bold text-forest">
+        <div className="motion-safe:animate-rise rounded-xl bg-mist p-3 text-center text-sm font-bold text-brand ring-1 ring-sky/60">
           {successMessage}
         </div>
       )}
@@ -172,7 +173,7 @@ export function LogForm() {
                   key={idx}
                   type="button"
                   onClick={() => setInputText(chip)}
-                  className="rounded-full border border-line bg-cream px-2.5 py-1 text-xs text-ink hover:border-leaf"
+                  className="rounded-full border border-sky/70 bg-paper px-2.5 py-1 text-xs text-brand transition-all hover:bg-mist active:scale-95"
                 >
                   {chip}
                 </button>
@@ -191,7 +192,7 @@ export function LogForm() {
 
           {/* MANDATORY CONFIRMATION STEP */}
           {parsedEntries && (
-            <div className="mt-4 border-t border-line pt-4 space-y-3">
+            <div className="mt-4 rounded-xl border border-sky/50 bg-mist/30 p-3 space-y-3 motion-safe:animate-pop">
               <div className="flex items-center justify-between">
                 <p className="text-sm font-bold text-ink">
                   Confirm Parsed Entries ({parsedEntries.length})
@@ -206,10 +207,10 @@ export function LogForm() {
                 {parsedEntries.map((entry, idx) => (
                   <div
                     key={idx}
-                    className="rounded-xl border border-line bg-paper p-3 text-xs space-y-2"
+                    className="rounded-xl border border-sky/40 bg-paper p-3 text-xs space-y-2"
                   >
                     <div className="flex items-center justify-between">
-                      <Pill tone={entry.type === "sale" ? "green" : "red"}>
+                      <Pill tone={entry.type === "sale" ? "brand" : "red"}>
                         {entry.type.toUpperCase()} · {entry.category}
                       </Pill>
                       <button
@@ -291,7 +292,7 @@ export function LogForm() {
                 }}
                 className={`flex-1 min-h-[44px] rounded-xl font-bold text-sm ${
                   manualType === "sale"
-                    ? "bg-forest text-white"
+                    ? "bg-brand text-white"
                     : "border border-line bg-paper text-muted"
                 }`}
               >

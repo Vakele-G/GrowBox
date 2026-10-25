@@ -3,6 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import type { Route } from "next";
+import { HeroBand } from "@/components/hero-band";
 import { Card, Pill } from "@/components/ui";
 import type { KnowledgeChunk } from "@/lib/domain/types";
 
@@ -30,35 +31,33 @@ export function LaunchView({ knowledgeChunks }: LaunchViewProps) {
       <div className="flex items-center justify-between">
         <Link
           href={"/" as Route}
-          className="text-xs font-bold text-forest hover:underline flex items-center gap-1"
+          className="text-xs font-bold text-brand hover:underline flex items-center gap-1"
         >
           ← Back to Home
         </Link>
-        <Pill tone="lime">Stage 2 Preview</Pill>
+        <Pill tone="sky">Stage 2 Preview</Pill>
       </div>
 
-      <header className="space-y-1">
-        <div className="flex items-center gap-2">
-          <Pill tone="amber">Preview - not fully built</Pill>
-          <span className="text-xs text-muted">Sourced & dated compliance</span>
-        </div>
-        <h1 className="text-2xl font-bold text-ink">Stage 2: Launch Checklist</h1>
-        <p className="text-xs text-muted">
-          The essential legal, food-handling, and municipal tasks every township food entrepreneur must complete before or during early trading.
-        </p>
-      </header>
+      <div className="motion-safe:animate-rise">
+        <HeroBand
+          eyebrow="GrowBox Stage Preview"
+          title="Stage 2: Launch Checklist"
+          subtitle="Sourced & dated compliance — the essential legal, food-handling, and municipal tasks every township food entrepreneur must complete before or during early trading."
+          action={<Pill tone="amber">Preview - not fully built</Pill>}
+        />
+      </div>
 
       {/* Progress Card */}
-      <Card className="p-4 space-y-2 bg-mint/20 border-leaf/30">
+      <Card className="p-4 space-y-2 bg-mist/20 border-accent/30">
         <div className="flex items-center justify-between text-xs">
           <span className="font-bold text-ink">Checklist Progress</span>
-          <span className="font-bold text-forest">
+          <span className="font-bold text-brand">
             {completedCount} of {totalCount} completed ({progressPct}%)
           </span>
         </div>
-        <div className="h-2 w-full rounded-full bg-sand overflow-hidden">
+        <div className="h-2 w-full rounded-full bg-canvas overflow-hidden">
           <div
-            className="h-full bg-leaf rounded-full transition-all duration-300"
+            className="h-full origin-left rounded-full bg-gradient-to-r from-accent to-brand motion-safe:animate-grow-x"
             style={{ width: `${progressPct}%` }}
           />
         </div>
@@ -72,15 +71,15 @@ export function LaunchView({ knowledgeChunks }: LaunchViewProps) {
         {knowledgeChunks.map((kc) => {
           const isDone = Boolean(completed[kc.id]);
           return (
-            <Card key={kc.id} className="p-4 space-y-3">
+            <Card key={kc.id} className="card-lift p-4 space-y-3">
               <div className="flex items-start justify-between gap-3">
                 <div className="flex items-start gap-2.5">
                   <button
                     onClick={() => toggleTask(kc.id)}
                     className={`mt-0.5 h-5 w-5 rounded border flex items-center justify-center text-xs font-bold transition-colors ${
                       isDone
-                        ? "bg-forest border-forest text-paper"
-                        : "border-line bg-paper text-transparent hover:border-forest"
+                        ? "bg-brand border-brand text-paper"
+                        : "border-line bg-paper text-transparent hover:border-brand"
                     }`}
                   >
                     ✓
@@ -94,7 +93,7 @@ export function LaunchView({ knowledgeChunks }: LaunchViewProps) {
                       {kc.title}
                     </h2>
                     <div className="flex items-center gap-2 mt-0.5">
-                      <span className="text-[10px] font-semibold text-forest uppercase">
+                      <span className="text-[10px] font-semibold text-brand uppercase">
                         {kc.topic}
                       </span>
                       <span className="text-[10px] text-muted">·</span>
@@ -103,7 +102,7 @@ export function LaunchView({ knowledgeChunks }: LaunchViewProps) {
                   </div>
                 </div>
 
-                <Pill tone={isDone ? "green" : "amber"}>
+                <Pill tone={isDone ? "brand" : "amber"}>
                   {isDone ? "Completed" : "Action Needed"}
                 </Pill>
               </div>
@@ -121,14 +120,14 @@ export function LaunchView({ knowledgeChunks }: LaunchViewProps) {
                     href={kc.sourceUrl}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="text-forest underline hover:text-ink truncate max-w-[180px]"
+                    className="text-brand underline hover:text-ink truncate max-w-[180px]"
                   >
                     {kc.sourceUrl.replace("https://www.", "").replace("https://", "")}
                   </a>
                   <span>·</span>
                   <span>Verified: {kc.lastVerified}</span>
                 </div>
-                <span className="italic font-medium text-amber-900">
+                <span className="italic font-medium text-amber-ink">
                   Verify with your municipality
                 </span>
               </div>
