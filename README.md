@@ -67,7 +67,7 @@ isiZulu. Full detail in [PROJECT_SPEC.md](PROJECT_SPEC.md).
   runway, stage detection, nudge rules, Health Score).
 - **AI:** adapter under `src/lib/ai` (Gemini structured output), with a
   deterministic fallback for every feature.
-- **Hosting:** Vercel.
+- **Hosting:** Vercel — production at <https://grow-box.vercel.app>.
 - **Tests:** Vitest. **Lint:** ESLint. **Types:** `tsc --noEmit`.
 
 ```
@@ -125,7 +125,8 @@ environment variables.
 The demo uses a seeded persona — Nomsa's Kitchen, a Soweto amagwinya and slap
 chips business with 14–30 days of trading history. The seed script is idempotent.
 
-- **Demo Login:** Click **"Sign in as Nomsa (Demo)"** on [`/login`](http://localhost:3000/login) (no password needed).
+- **Live App:** <https://grow-box.vercel.app> — the shared link opens the demo sign-in at [`/login`](https://grow-box.vercel.app/login); signed-out visitors are bounced there from every other route.
+- **Demo Login:** Click **"Sign in as Nomsa (Demo)"** on [`/login`](https://grow-box.vercel.app/login) (no password needed).
 - **Seeded Persona:** Nomsa's Kitchen (Soweto), Stage 3 (Stable), 56% gross margin, Health Score in the 60–70 Bankable-track band.
 
 ### Screen & Route Directory

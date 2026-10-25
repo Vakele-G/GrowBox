@@ -32,6 +32,8 @@ Repo, agent instructions, and the milestone commit script are in place.
 - PWA manifest and basic app shell; placeholder home screen.
 - Deploy to Vercel; record the public URL in the completion report.
 
+**Public URL:** <https://grow-box.vercel.app> (production, deployed 2026-10-25).
+
 **Done when:** all checks pass and the public URL loads the app shell.
 
 ---
