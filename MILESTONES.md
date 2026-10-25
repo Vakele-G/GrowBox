@@ -190,3 +190,4 @@ Append one line per published milestone: `MID — checks — commit — push`.
 - M06 — lint, typecheck, test, build pass — 7b2bfa0 — pushed
 - M07 — lint, typecheck, test, build pass — 17c6367 — pushed
 - M08 — lint, typecheck, test, build pass — <pending commit> — pending push
+- S01 — lint, typecheck, test, build pass — f154a9e — pushed
